@@ -1,0 +1,18 @@
+﻿@model CampgroundAddressModel
+
+<div asp-validation-summary="ModelOnly"></div>
+<input type="hidden" asp-for="CampgroundId"/>
+
+<div class="content">
+    <div class="form-horizontal">
+        <div class="panel-group">
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_customer_address_details_top", additionalData = Model.Address?.Id })
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Shared/EditorTemplates/Address.cshtml", Model)
+                </div>
+            </div>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_customer_address_details_bottom", additionalData = Model.Address?.Id })
+        </div>
+    </div>
+</div>

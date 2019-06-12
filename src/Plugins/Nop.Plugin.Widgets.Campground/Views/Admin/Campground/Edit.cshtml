@@ -1,0 +1,99 @@
+﻿@model CampgroundModel
+
+@{
+    //page title
+    ViewBag.Title = T("admin.campgrounds.EditCampgroundDetails").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Campgrounds");
+}
+
+<form asp-controller="Campground" asp-action="Edit" method="post" id="campground-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("admin.campgrounds.EditCampgroundDetails") - @Model.Name
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("admin.campgrounds.BackToList")</a>
+            </small>
+        </h1>
+        <div class="pull-right">
+            <button type="button" onclick="javascript:window.open('@Url.RouteUrl("CampgroundDetail", new {SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })', '_blank').focus();" class="btn bg-purple">
+                <i class="fa fa-eye"></i>
+                @T("Admin.Common.Preview")
+            </button>
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+            <button type="submit" name="save-continue" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.SaveContinue")
+            </button>
+            <button type="button" name="copycampground" class="btn bg-olive" data-toggle="modal" data-target="#copycampground-window">
+                <i class="fa fa-clone"></i>
+                @T("admin.campgrounds.Copy")
+            </button>
+            <span id="campground-delete" class="btn bg-red">
+                <i class="fa fa-trash-o"></i>
+                @T("Admin.Common.Delete")
+            </span>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_details_buttons", additionalData = Model.Id })
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.cshtml", Model)
+</form>
+<nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="campground-delete" />
+
+@if (!Model.IsLoggedInAsCampgroundHost)
+{
+    //campground editor settings modal
+    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CampgroundEditorSettingsModal.cshtml", Model)
+}
+
+@*copy campground form*@
+<div id="copycampground-window" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="copycampground-window-title">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="copycampground-window-title">@T("admin.campgrounds.Copy")</h4>
+            </div>
+            <form asp-controller="Campground" asp-action="CopyCampground" method="post">
+                <div class="form-horizontal">
+                    <div class="modal-body">
+                        <input asp-for="CopyCampgroundModel.Id" type="hidden" />
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <nop-label asp-for="CopyCampgroundModel.Name" />
+                            </div>
+                            <div class="col-md-8">
+                                <nop-editor asp-for="CopyCampgroundModel.Name" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <nop-label asp-for="CopyCampgroundModel.Published" />
+                            </div>
+                            <div class="col-md-8">
+                                <nop-editor asp-for="CopyCampgroundModel.Published" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-4">
+                                <nop-label asp-for="CopyCampgroundModel.CopyImages" />
+                            </div>
+                            <div class="col-md-8">
+                                <nop-editor asp-for="CopyCampgroundModel.CopyImages" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">
+                            @T("admin.campgrounds.Copy")
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

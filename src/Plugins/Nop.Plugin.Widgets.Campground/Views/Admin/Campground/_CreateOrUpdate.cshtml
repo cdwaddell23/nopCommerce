@@ -1,0 +1,40 @@
+﻿@model CampgroundModel
+@inject Nop.Services.Events.IEventPublisher eventPublisher
+@using Nop.Web.Framework.Events
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+<div class="content">
+    <div class="form-horizontal">
+        <div class="row">
+            <div class="col-md-12 clearfix">
+                <div class="pull-left">
+                    @await Component.InvokeAsync("SettingMode", new { modeName = "campground-advanced-mode" })
+                </div>
+                @if (!Model.IsLoggedInAsCampgroundHost)
+                {
+                    <button type="button" class="btn btn-info pull-left margin-l-10" id="campground-editor-settings" data-toggle="modal" data-target="#campgroundsettings-window">
+                        <i class="fa fa-gear"></i>
+                        @T("Admin.Configuration.Settings.CampgroundEditor.Button")
+                    </button>
+                }
+            </div>
+        </div>
+        <nop-tabs id="campground-edit">
+            <nop-tab asp-name="tab-info" asp-title="@T("admin.campgrounds.Info")" asp-default="true">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.Info.cshtml", Model)</nop-tab>
+            <nop-tab asp-name="tab-seo" asp-title="@T("Admin.Common.SEO")" class="@(Model.CampgroundEditorSettingsModel.Seo ? "" : "advanced-setting")">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.SEO.cshtml", Model)</nop-tab>
+            <nop-tab asp-name="tab-address" asp-title="@T("admin.campgrounds.Address")">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.CampgroundAddresses.cshtml", Model)</nop-tab>
+            <nop-tab asp-name="tab-pictures" asp-title="@T("admin.campgrounds.Pictures")">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.Pictures.cshtml", Model)</nop-tab>
+            <nop-tab asp-name="tab-campground-attributes" asp-title="@T("Admin.Campgrounds.CampgroundAttributes")" class="@(Model.CampgroundEditorSettingsModel.CampgroundAttributeTypes ? "" : "advanced-setting")">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.CampgroundAttributeTypes.cshtml", Model)</nop-tab>
+            <nop-tab asp-name="tab-specification-attributes" asp-title="@T("Admin.Catalog.Attributes.SpecificationAttributes")" class="@(Model.CampgroundEditorSettingsModel.SpecificationAttributes ? "" : "advanced-setting")">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.SpecificationAttributes.cshtml", Model)</nop-tab>
+        </nop-tabs>
+    </div>
+</div>
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "campground-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}

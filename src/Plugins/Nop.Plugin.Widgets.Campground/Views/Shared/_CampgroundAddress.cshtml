@@ -1,0 +1,178 @@
+﻿@model CampgroundModel
+<div class="panel-heading title">
+    @T("CampgroundRegister.section.address")
+</div>
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="Name" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="Name" placeholder="@T("CampgroundRegister.CampgroundName.Hint")" ng-model="Campground.Name" ng-blur="Validate()" />
+                <nop-required />
+                <span asp-validation-for="Name"></span>
+            </div>
+        </div>
+        @if (Model.CampgroundAddress.CountryEnabled)
+        {
+            <div class="form-group">
+                <div class="col-md-3">
+                    <nop-label asp-for="CampgroundAddress.CountryId" />
+                </div>
+                <div class="col-md-9">
+                    <select asp-for="CampgroundAddress.CountryId" asp-items="Model.CampgroundAddress.AvailableCountries" ng-model="Campground.CountryId"></select>
+                    <span asp-validation-for="CampgroundAddress.CountryId"></span>
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.Address1" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.Address1" placeholder="@T("CampgroundRegister.address1.Hint")" asp-required="@Model.CampgroundAddress.StreetAddressRequired" ng-model="Campground.Address1" />
+                <span asp-validation-for="CampgroundAddress.Address1"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.Address2" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.Address2" placeholder="@T("CampgroundRegister.address2.Hint")" asp-required="@Model.CampgroundAddress.StreetAddress2Required" ng-model="Campground.Address2" />
+                <span asp-validation-for="CampgroundAddress.Address2"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.City" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.City" placeholder="@T("CampgroundRegister.city.Hint")" asp-required="@Model.CampgroundAddress.CityRequired" ng-model="Campground.City" />
+                <span asp-validation-for="CampgroundAddress.City"></span>
+            </div>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.StateProvinceId" />
+            </div>
+            <div class="col-md-9">
+                <select asp-for="CampgroundAddress.StateProvinceId" id="mapStateProvince" asp-items="Model.CampgroundAddress.AvailableStates" ng-model="Campground.StateProvinceId"></select>
+                <span asp-validation-for="CampgroundAddress.StateProvinceId"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.ZipPostalCode" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.ZipPostalCode" placeholder="@T("CampgroundRegister.zippostalcode.Hint")" asp-required="@Model.CampgroundAddress.ZipPostalCodeRequired" ng-model="Campground.ZipPostalCode" ng-blur="Validate()" />
+                <span asp-validation-for="CampgroundAddress.ZipPostalCode"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="col-md-3">
+                        <nop-label asp-for="CampgroundAddress.Latitude" />
+                    </div>
+                    <div class="col-md-9">
+                        <input asp-for="CampgroundAddress.Latitude" id="mapLatitude" class="address-item" placeholder="@T("CampgroundRegister.latitude.Hint")" ng-model="Campground.Latitude" />
+                        <nop-required />
+                        <span asp-validation-for="CampgroundAddress.Latitude"></span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="col-md-3">
+                        <nop-label asp-for="CampgroundAddress.Longitude" />
+                    </div>
+                    <div class="col-md-9">
+                        <input asp-for="CampgroundAddress.Longitude" id="mapLongitude" class="address-item" placeholder="@T("CampgroundRegister.longitude.Hint")" ng-model="Campground.Longitude" />
+                        <nop-required />
+                        <span asp-validation-for="CampgroundAddress.Longitude"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="teal-text">
+            @T("CampgroundRegister.Address.Hint")
+        </div>
+        <div class="panel-heading title">
+            @T("CampgroundRegister.section.contact")
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.FirstName" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.FirstName" placeholder="@T("CampgroundRegister.firstname.Hint")" asp-required="@Model.CampgroundAddress.FirstNameRequired" ng-model="Campground.FirstName" />
+                <span asp-validation-for="CampgroundAddress.FirstName"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.LastName" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.LastName" placeholder="@T("CampgroundRegister.lastname.Hint")" asp-required="@Model.CampgroundAddress.LastNameRequired" ng-model="Campground.LastName" />
+                <span asp-validation-for="CampgroundAddress.LastName"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.Email" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.Email" placeholder="@T("CampgroundRegister.email.Hint")" asp-required="@Model.CampgroundAddress.EmailRequired" ng-model="Campground.Email" />
+                <span asp-validation-for="CampgroundAddress.Email"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.PhoneNumber" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.PhoneNumber" asp-required="@Model.CampgroundAddress.PhoneRequired" ng-model="Campground.PhoneNumber" />
+                <span asp-validation-for="CampgroundAddress.PhoneNumber"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-3">
+                <nop-label asp-for="CampgroundAddress.FaxNumber" />
+            </div>
+            <div class="col-md-9">
+                <input asp-for="CampgroundAddress.FaxNumber" asp-required="@Model.CampgroundAddress.FaxRequired" ng-model="Campground.FaxNumber" />
+                <span asp-validation-for="CampgroundAddress.FaxNumber"></span>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-12">
+                <input asp-for="CampgroundAddress.GooglePlaceId" id="mapGooglePlaceId" class="address-item" ng-model="Campground.GooglePlaceId" hidden />
+                <input asp-for="CampgroundAddress.GoogleGeocodeURL" id="mapGoogleGeocodeURL" class="address-item" ng-model="Campground.GoogleGeocodeURL" hidden />
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6">
+        <div id="map" class="large_map"></div>
+        <div id="FoundAddress" class="message-error">
+            <p class="center-align">Verify the marker (<img src="//www.camptale.com/plugins/campgrounds/content/images/maps/camping-green-logo.png" alt="camping map logo" />) is located properly on the map. This is how people will locate the campground from our apps.</p>
+        </div>
+        <div id="NoAddress" style="display: none;" class="message-error">
+            <p class="center-align">@T("CampgroundRegister.error.addressnotfound")</p>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+    function initMap() {
+        this.mapZoom = 17;
+        this.mapType = 'satellite';
+        @if (Model.CampgroundAddress.Latitude != null) {
+        <text>
+        this.campgroundLatLng = { lat: @Model.CampgroundAddress.Latitude, lng: @Model.CampgroundAddress.Longitude };
+        </text>
+        }
+        initAddressMap();
+    }
+</script>

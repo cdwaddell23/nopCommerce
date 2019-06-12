@@ -1,0 +1,65 @@
+﻿@model CampgroundAddressModel
+@{
+    Layout = "~/Plugins/Campgrounds/Views/Shared/_ColumnsOne.cshtml";
+}
+<h1 class="title">Camping near my location</h1>
+<div class="content">
+    <div class="row">
+        <div class="col-md-4">
+            <h2 class="sub-title owl-title" style="font-family: unset;">
+                In order to find campgrounds around your location, we need your permission to use your current location.<br /><br />
+                We do not save any location data and never will.
+            </h2>
+            <div class="center">
+                <form asp-route="CampgroundNearby" id="nearbyCamping" method="post" class="form-horizontal">
+                    <input asp-for="Latitude" hidden>
+                    <input asp-for="Longitude" hidden>
+                    <button id="btnLocation" type="button" class="btn btn-info" onclick="allowLocation()">Find campgrounds near my location</button>
+                    <img id="imgWait" src="~/images/preloader.gif" style="display:none" />
+                    <div id="error" class="error" style="display:none">Looks like we hit an error getting your location.</div>
+                </form>
+            </div>
+            <h3>Campgrounds by state</h3>
+            @await Component.InvokeAsync("CampgroundMenu", new { topMenu = false, supressNearby = true })
+        </div>
+        <div class="col-md-8">
+            @await Component.InvokeAsync("NewCampgrounds")
+        </div>
+        <script asp-location="Footer">
+            var coordinates
+            var options = {
+                enableHighAccuracy: true,
+                timeout: 5000,
+                maximumAge: 0
+            };
+
+            function allowLocation() {
+
+                if (!navigator.geolocation) {
+                    $('#error').html = "<p>Geolocation is not supported by your browser</p>";
+                    return;
+                }
+
+                function success(position) {
+                    coordinates = position.coords;
+                    document.getElementById('Latitude').value = coordinates.latitude;
+                    document.getElementById('Longitude').value = coordinates.longitude;
+                    var sForm = document.getElementById('nearbyCamping');
+                    if (sForm) {
+                        sForm.submit();
+                    }
+                }
+
+                function logError(error) {
+                    $('#imgWait').hide();
+                    $('#error').show();
+                    console.warn(`ERROR(${error.code}): ${error.message}`);
+                }
+
+                $('#btnLocation').hide();
+                $('#imgWait').show();
+                navigator.geolocation.getCurrentPosition(success, logError, options);
+            }
+        </script>
+    </div>
+</div>

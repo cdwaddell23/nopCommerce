@@ -1,0 +1,32 @@
+﻿@model CampgroundModel.CampgroundAttributeMappingModel
+
+@{
+    //page title
+    ViewBag.Title = T("Admin.Campgrounds.CampgroundAttributes.Attributes.AddNew").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Campgrounds");
+}
+
+<form asp-controller="Campground" asp-action="CampgroundAttributeMappingCreate" method="post" id="campgroundattribute-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Campgrounds.CampgroundAttributes.Attributes.AddNew")
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="Edit" asp-route-id="@Model.CampgroundId">@T("Admin.Campgrounds.CampgroundAttributes.Attributes.BackToCampground")</a>
+            </small>
+        </h1>
+        <div class="pull-right">
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+            <button type="submit" name="save-continue" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.SaveContinue")
+            </button>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_attribute_mapping_details_buttons" })
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdateCampgroundAttributeMapping.cshtml", Model)
+</form>

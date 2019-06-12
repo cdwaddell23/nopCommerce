@@ -1,0 +1,48 @@
+﻿@model CampgroundCategoryModel
+@{
+    var i = 0;
+    if (Model.SubCategories.Count() > 0)
+    {
+        <ul class="@(Model.IncludeInTopMenu ? "dropdown-menu multi-column " : "")columns-4">
+            <div class="row">
+                <div class="col s3">
+                    <ul class="multi-column-dropdown">
+                        @if (!Model.SuppressNearby)
+                        {
+                            <li>
+                                <a href="@Url.RouteUrl("CampgroundNearby")"><span class="fa fa-map-marker"></span> Nearby Campgrounds</a>
+                            </li>
+                        }
+                        @foreach (var subCategory in Model.SubCategories)
+                        {
+                            if (i > 0 && i % 13 == 0)
+                            {
+                                @Html.Raw("</ul>")
+                                @Html.Raw("</div>")
+                                @Html.Raw("<div class='col s3'>")
+                                @Html.Raw("<ul class='multi-column-dropdown'>")
+                            }
+                            <li>
+                                @if (subCategory.NumberOfCampgrounds.HasValue && subCategory.NumberOfCampgrounds > 1)
+                                {
+                                    <div class="hide-on-small-and-down">
+                                        <a href="@Url.RouteUrl("CampgroundCategories", new { SeName = subCategory.SeName })">
+                                            @subCategory.Name
+                                            @T("Categories.TotalCampgrounds", subCategory.NumberOfCampgrounds.Value)
+                                        </a>
+                                    </div>
+                                    <div class="hide-on-med-and-up">
+                                        <a href="@Url.RouteUrl("CampgroundCategories", new { SeName = subCategory.SeName })">
+                                            @subCategory.Name
+                                        </a>
+                                    </div>
+                                }
+                            </li>
+                            i++;
+                        }
+                    </ul>
+                </div>
+            </div>
+        </ul>
+    }
+}

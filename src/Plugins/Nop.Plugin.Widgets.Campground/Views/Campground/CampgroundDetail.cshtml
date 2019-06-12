@@ -1,0 +1,267 @@
+@model CampgroundDetailModel
+@using Nop.Core.Domain.Common
+@using Nop.Core.Domain.Seo
+@using Nop.Plugin.Widgets.Campgrounds.Mapping
+@using System.Device.Location
+@using Nop.Web.Extensions;
+@inject SeoSettings seoSettings
+@inject CommonSettings commonSettings
+@{
+    Layout = "~/Plugins/Campgrounds/Views/Shared/_ColumnsOneAngular.cshtml";
+    Html.AddCssFileParts(ResourceLocation.Head, "~/plugins/campgrounds/content/photoswipe/photoswipe.css");
+    Html.AddCssFileParts(ResourceLocation.Head, "~/plugins/campgrounds/content/photoswipe/default-skin/default-skin.css");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/js/camptale.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/photoswipe/photoswipe.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/photoswipe/photoswipe-ui-default.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "//maps.googleapis.com/maps/api/js?key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c&libraries=places&callback=initMap", isAsync: true, excludeFromBundle: true);
+
+
+    //title
+    Html.AddTitleParts(!string.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name + " Campgrounds");
+    //meta
+    Html.AddMetaDescriptionParts(!string.IsNullOrEmpty(Model.MetaDescription) ? Model.MetaDescription : Model.Description);
+    Html.AddMetaKeywordParts(!string.IsNullOrEmpty(Model.MetaKeywords) ? Model.MetaKeywords : Model.Name.ToLower() + " campgrounds, camping in " + Model.Name.ToLower() + ", tent camping around " + Model.Name.ToLower() + ", rv camping, car camping, tent campsites, boondocking");
+    //page class
+    Html.AppendPageCssClassParts("html-campground-page");
+
+    if (seoSettings.CanonicalUrlsEnabled)
+    {
+        var campgroundDetailUrl = Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName }, this.Url.ActionContext.HttpContext.Request.Scheme);
+        Html.AddCanonicalUrlParts(campgroundDetailUrl, seoSettings.QueryStringInCanonicalUrlsEnabled);
+    }
+
+    var breadcrumbDelimiter = commonSettings.BreadcrumbDelimiter;
+    var campgroundCoordinates = new List<GeoCoordinate>();
+    var mapPoints = new List<MapPoints>();
+    var i = 1;
+}
+<div class="row features_items">
+    <!--features_items-->
+    <div class="col l8 m9 s12 pull-left">
+        <h1 class="title text-center" itemprop="name">@(Model.Id > 0 ? Model.Name + " Campground" : Model.Name)</h1>
+        @if (Model.Id > 0)
+        {
+            <h2 class="sub-title text-center" itemprop="address">@Model.CampgroundAddress.Address1, @Model.CampgroundAddress.City, @Model.CampgroundAddress.StateProvince?.Name @Model.CampgroundAddress.ZipPostalCode</h2>
+        }
+        else
+        {
+            <h2 class="sub-title text-center" itemprop="address">
+                We have your current location as Lat: @String.Format("{0:N3}", Model.CampgroundAddress.Latitude), Long:  @String.Format("{0:N3}", Model.CampgroundAddress.Longitude). These are the campgrounds in a 25 mile radius.
+            </h2>
+        }
+        <div class="row center">
+            @if (!string.IsNullOrEmpty(Model.Website))
+            {
+                <a href="http://@Model.Website/" name="@Model.Website" class="center-align" target="_blank" rel="noopener" itemprop="url">@Model.Website</a>
+            }
+            @if (!string.IsNullOrEmpty(Model.Phone))
+            {
+                <text><br />Phone: </text>@Model.Phone
+            }
+            @if (Model.CampgroundAddress.Latitude != 0)
+            {
+                <br /><a style="touch-action: manipulation;" href="https://www.google.com/maps/dir/Current+Location/@Model.CampgroundAddress.Latitude,@Model.CampgroundAddress.Longitude" target="_blank" rel="noopener">
+                    <i class="fa fa-road"></i>
+                    <span>Driving Directions</span>
+                </a>
+            }
+            <br /><a target="_blank" href="https://www.amazon.com/b?_encoding=UTF8&tag=camptale23-20&linkCode=ur2&linkId=32b4e6d699637eebf1fa76a761647c53&camp=1789&creative=9325&node=706814011"><i class="fa fa-binoculars"></i> Gear up for the Season!</a><img src="//ir-na.amazon-adsystem.com/e/ir?t=ct-detail-20&l=ur2&o=1" width="1" height="1" border="0" alt="" style="border:none !important; margin:0px !important;" />
+        </div>
+        <p class="campground-detail" itemprop="description">@Html.Raw(Model.FullDescription)</p>
+        @if (Model.AvailableCampsites > 0)
+        {
+            <p>@(Model.AvailableCampsites <= 50 ? Html.Raw("This campground boasts to have <b>" + Model.AvailableCampsites + "</b> campsites available.") : Html.Raw("Camping is plentiful here with <b>" + Html.Raw(Model.AvailableCampsites) + "</b> sites available."))</p>
+        }
+        <h5 id="location-@Model.Id">Location</h5>
+        <div id="map" class="small_map"></div>
+        @if (Model.Id > 0)
+        {
+            <div class="row">
+                <div class="col m4 s4">
+                    <h6 id="amenities-@Model.Id">Amenities<span class="text-sm">*</span></h6>
+                    <ul>
+                        <li>
+                            Picnic table
+                        </li>
+                        <li>
+                            Fire Ring
+                        </li>
+                        <li>
+                            Potable water
+                        </li>
+                        <li>
+                            Wifi
+                        </li>
+                        <li>
+                            Pets Welcomed
+                        </li>
+                        <li>
+                            RV hookup
+                        </li>
+                        <li>
+                            RV sanitation
+                        </li>
+                    </ul>
+                </div>
+                <div class="col m4 s4">
+                    <h6 id="activites-@Model.Id">Activities<span class="text-sm">*</span></h6>
+                    <ul>
+                        <li>
+                            Biking
+                        </li>
+                        <li>
+                            Boating
+                        </li>
+                        <li>
+                            Fishing
+                        </li>
+                        <li>
+                            Hiking
+                        </li>
+                        <li>
+                            Horseback riding
+                        </li>
+                        <li>
+                            Wind sports
+                        </li>
+                        <li>
+                            Climbing
+                        </li>
+                        <li>
+                            Snow sports
+                        </li>
+                        <li>
+                            Surfing
+                        </li>
+                        <li>
+                            Swimming
+                        </li>
+                        <li>
+                            Wildlife watching
+                        </li>
+                    </ul>
+                </div>
+                <div class="col m4 s4">
+                    <h6 id="services-@Model.Id">Services<span class="text-sm">*</span></h6>
+                    <ul>
+                        <li>
+                            Laundry
+                        </li>
+                        <li>
+                            Playground
+                        </li>
+                        <li>
+                            Arcade
+                        </li>
+                        <li>
+                            General Store
+                        </li>
+                        <li>
+                            Firewood for Sale
+                        </li>
+                        <li>
+                            Site Rental
+                        </li>
+                        <li>
+                            Toilets
+                        </li>
+                        <li>
+                            Trash
+                        </li>
+                        <li>
+                            Showers
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div id="review-section" class="row"><div class="col m12 s12"><span class="red-text">* </span> Some but not all of these items are available at this site.</div></div>
+            <hr />
+            <section>
+                <h5 id="reviews-@Model.Id">@Model.Name Reviews</h5>
+                @Html.Partial("~/Plugins/Campgrounds/Views/Shared/_CampgroundReviewOverview.cshtml", Model.CampgroundReviewOverviewModel)
+                @await Component.InvokeAsync("CampgroundReviewContent", new { campgroundId = Model.Id })
+            </section>
+        }
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-3544167684134058"
+             data-ad-slot="9388058609"
+             data-ad-format="auto"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+    </div>
+    <div class="col l4 m3 s12">
+        @await Component.InvokeAsync("SearchCampgrounds", new { categoryId = Model.ParentCategoryId })
+        <h5>@T("Campgrounds.Detail.Nearby")</h5>
+        @foreach (var item in Model.NearbyCampgrounds)
+        {
+            if (i <= 6)
+            {
+                campgroundCoordinates.Add(new GeoCoordinate((double)item.CampgroundAddress.Latitude, (double)item.CampgroundAddress.Longitude));
+                mapPoints.Add(new MapPoints(item.Id.ToString(), item.Name, item.Description, new GeoCoordinate((double)item.CampgroundAddress.Latitude, (double)item.CampgroundAddress.Longitude)));
+                @Html.Partial("~/Plugins/Campgrounds/Views/Shared/_CampgroundTile.cshtml", item)
+                @if (i == 2)
+                {
+                    <div class="row campground-summary-card">
+                        <div class="row">
+                            <script type="text/javascript">
+                                amzn_assoc_placement = "adunit0";
+                                amzn_assoc_search_bar = "true";
+                                amzn_assoc_tracking_id = "ct-overview-20";
+                                amzn_assoc_search_bar_position = "top";
+                                amzn_assoc_ad_mode = "search";
+                                amzn_assoc_ad_type = "smart";
+                                amzn_assoc_marketplace = "amazon";
+                                amzn_assoc_region = "US";
+                                amzn_assoc_title = "Shop Camping Products";
+                                amzn_assoc_default_search_phrase = "Blackstone camp stove";
+                                amzn_assoc_default_category = "All";
+                                amzn_assoc_linkid = "3478ddde7ba2024bccf65fb71d22a424";
+                            </script>
+                            <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+                        </div>
+                    </div>
+                }
+                @if (i == 4)
+                {
+                    <div class="row campground-summary-card">
+                        <div class="row">
+                            <script type="text/javascript">
+                                amzn_assoc_placement = "adunit0";
+                                amzn_assoc_search_bar = "true";
+                                amzn_assoc_tracking_id = "ct-overview-20";
+                                amzn_assoc_search_bar_position = "top";
+                                amzn_assoc_ad_mode = "search";
+                                amzn_assoc_ad_type = "smart";
+                                amzn_assoc_marketplace = "amazon";
+                                amzn_assoc_region = "US";
+                                amzn_assoc_title = "Shop Related Products";
+                                amzn_assoc_default_search_phrase = "Hiking Boots";
+                                amzn_assoc_default_category = "All";
+                                amzn_assoc_linkid = "2242887af27428ff24813e15d78565d3";
+                            </script>
+                            <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+                        </div>
+                    </div>
+                }
+            }
+            i++;
+        }
+    </div>
+</div>
+<script type="text/javascript" asp-location="Head">
+    function initMap() {
+        @foreach(var mapPoint in mapPoints) {
+            if (mapPoint.CampgroundLocation.Latitude != 0 && mapPoint.CampgroundLocation.Longitude != 0) {
+            <text>
+            this.locations.push(['@mapPoint.Name', '@mapPoint.Description', @mapPoint.CampgroundLocation.Latitude, @mapPoint.CampgroundLocation.Longitude, @mapPoint.Id]);</text>
+            }
+        }
+        this.mapZoom = 10;
+        this.mapType = 'Satellite';
+        this.campgroundLatLng = { lat: @Model.CampgroundAddress.Latitude, lng: @Model.CampgroundAddress.Longitude };
+        initDetailMap('@Model.Name', '@Model.Description');
+        showSmallSearchAd();
+    }
+</script>

@@ -1,0 +1,11 @@
+﻿{
+  "Group": "Campground Widgets",
+  "FriendlyName": "Campground Menu Widget",
+  "SystemName": "Widgets.Campgrounds",
+  "Version": "1.00",
+  "SupportedVersions": [ "4.10" ],
+  "Author": "DeanSystems, Inc",
+  "DisplayOrder": 1,
+  "FileName": "Nop.Plugin.Widgets.Campgrounds.dll",
+  "Description": "This plugin allows you to manage campground reviews and reservations. "
+}

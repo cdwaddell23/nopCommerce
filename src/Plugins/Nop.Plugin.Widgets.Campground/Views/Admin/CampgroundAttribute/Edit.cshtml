@@ -1,0 +1,37 @@
+﻿@model CampgroundAttributeTypeModel
+
+@{
+    //page title
+    ViewBag.Title = T("Admin.Catalog.Attributes.CampgroundAttributes.EditAttributeDetails").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Campground attributes");
+}
+
+<form asp-controller="CampgroundAttributeType" asp-action="Edit" method="post" id="campgroundattribute-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Catalog.Attributes.CampgroundAttributes.EditAttributeDetails") - @Model.Name
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("Admin.Catalog.Attributes.CampgroundAttributes.BackToList")</a>
+            </small>
+        </h1>
+        <div class="pull-right">
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+            <button type="submit" name="save-continue" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.SaveContinue")
+            </button>
+            <span id="campgroundattribute-delete" class="btn bg-red">
+                <i class="fa fa-trash-o"></i>
+                @T("Admin.Common.Delete")
+            </span>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_attribute_details_buttons", additionalData = Model.Id })
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/CampgroundAttribute/_CreateOrUpdate.cshtml", Model)
+</form>
+<nop-delete-confirmation asp-model-id="@Model.Id" asp-button-id="campgroundattribute-delete" />

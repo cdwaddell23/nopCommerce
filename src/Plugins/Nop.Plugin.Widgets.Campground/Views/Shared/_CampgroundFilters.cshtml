@@ -1,0 +1,82 @@
+﻿@model CampgroundPagingFilteringModel
+<div class="col m12 campground-search">
+    @using (Html.BeginRouteForm("CampgroundSearch", FormMethod.Get))
+    {
+        <div class="row">
+            <input placeholder="Campground name" class="form-control campground-search" id="txtLocationSearch" name="sTerms" type="text" autocomplete="off">
+            <button class="btn campground-search-button" type="submit" name="action">
+                <span class="visible-xs visible-sm"><i class="fa fa-search" style="font-size:16px;"></i></span>
+                <span class="visible-md visible-lg">@T("Search.Campground.SearchBox.Tooltip")</span>
+            </button>
+        </div>
+    }
+
+    @*<div class="row" style="display:none;">
+            <div class="col m2 s12">
+                @Html.ListBoxFor(x => x.FilterTypeModes, new MultiSelectList(@Model.FilterTypeModes, "Value", "Text", @Model.CampgroundTypeSelectedIndexes), new { @class = "chosen-select" })
+            </div>
+            <div class="col m2 s12">
+                @Html.ListBoxFor(x => x.FilterAmenitiesModes, new MultiSelectList(@Model.FilterAmenitiesModes, "Value", "Text", @Model.AmenitiesSelectedIndexes), new { @class = "chosen-select" })
+            </div>
+            <div class="col m2 s12">
+                @Html.ListBoxFor(x => x.FilterActivitiesModes, new MultiSelectList(@Model.FilterActivitiesModes, "Value", "Text", @Model.ActivitiesSelectedIndexes), new { @class = "chosen-select" })
+            </div>
+            <div class="col m2 s12">
+                @Html.ListBoxFor(x => x.FilterServicesModes, new MultiSelectList(@Model.FilterServicesModes, "Value", "Text", @Model.ServicesSelectedIndexes), new { @class = "chosen-select" })
+            </div>
+            <div class="col m4 s12 align-left">
+                <div class="btn">
+                    <span class="visible-xs visible-sm"><i class="fa fa-filter" style="font-size:16px;"></i></span>
+                    <span class="visible-md visible-lg">@T("Search.Campground.Filterbox.Button")</span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+                <div class="col m2 s12">
+                    @Html.ListBoxFor(x => x.FilterTypeModes, new MultiSelectList(@Model.FilterTypeModes, "Value", "Text", @Model.CampgroundTypeSelectedIndexes), new { @class = "chosen-select" })
+                </div>
+                <div class="col m2 s12">
+                    @Html.ListBoxFor(x => x.FilterAmenitiesModes, new MultiSelectList(@Model.FilterAmenitiesModes, "Value", "Text", @Model.AmenitiesSelectedIndexes), new { @class = "chosen-select" })
+                </div>
+                <div class="col m2 s12">
+                    @Html.ListBoxFor(x => x.FilterActivitiesModes, new MultiSelectList(@Model.FilterActivitiesModes, "Value", "Text", @Model.ActivitiesSelectedIndexes), new { @class = "chosen-select" })
+                </div>
+                <div class="col m2 s12">
+                    @Html.ListBoxFor(x => x.FilterServicesModes, new MultiSelectList(@Model.FilterServicesModes, "Value", "Text", @Model.ServicesSelectedIndexes), new { @class = "chosen-select" })
+                </div>
+                <div class="col m4 s12 align-left">
+                    <div class="btn">
+                        <span class="visible-xs visible-sm"><i class="fa fa-filter" style="font-size:16px;"></i></span>
+                        <span class="visible-md visible-lg">@T("Search.Campground.Filterbox.Button")</span>
+                    </div>
+                </div>
+            </div>
+            <script>
+                var options = [];
+
+                $('.dropdown-menu a').on('click', function (event) {
+
+                    var $target = $(event.currentTarget),
+                        val = $target.attr('data-value'),
+                        $inp = $target.find('input'),
+                        idx;
+
+                    if ((idx = options.indexOf(val)) > -1) {
+                        options.splice(idx, 1);
+                        setTimeout(function () { $inp.prop('checked', false) }, 0);
+                    } else {
+                        options.push(val);
+                        setTimeout(function () { $inp.prop('checked', true) }, 0);
+                    }
+
+                    $(event.target).blur();
+
+                    console.log(options);
+                    return false;
+                });
+
+                $(document).ready(function () {
+                    $('select').material_select();
+                });
+            </script>*@
+</div>

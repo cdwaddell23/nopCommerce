@@ -1,0 +1,21 @@
+﻿@model CampgroundCategoryModel
+@{
+    Layout = "~/Plugins/Campgrounds/Views/Shared/_ColumnsOne.cshtml";
+    Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/js/camptale.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "//maps.googleapis.com/maps/api/js?key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c&libraries=places&callback=initMap", isAsync: true, excludeFromBundle: true);
+}
+<h1 class="title">Camping by State</h1>
+<h2 class="sub-title">Search for camping by State or click on a state to browse all the campgrounds we have for the State</h2>
+<div class="content">
+    <div class="row">
+        <div class="col-md-5">
+            @await Component.InvokeAsync("SearchCampgrounds")
+        </div>
+    </div>
+    @await Component.InvokeAsync("CampgroundMenu", new { topMenu = false })
+</div>
+<script type="text/javascript" asp-location="Footer">
+    $(document).ready(function () {
+        showLargeSearchAd();
+    });
+</script>

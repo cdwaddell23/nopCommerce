@@ -1,0 +1,9 @@
+﻿Group: Campgrounds
+FriendlyName: Campgrounds
+SystemName: Campgrounds
+Version: 1.0
+SupportedVersions: 3.90
+Author: Cary D Waddell
+DisplayOrder: 1
+FileName: Nop.Plugin.Campgrounds.dll
+Description: This plugin allows you to configure discounts for certain customer groups (roles)

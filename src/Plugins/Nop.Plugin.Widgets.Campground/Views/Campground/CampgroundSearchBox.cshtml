@@ -1,0 +1,56 @@
+@model CampgroundSearchBoxModel
+@using System.Text.Encodings.Web
+
+@using (Html.BeginRouteForm("CampgroundSearch", FormMethod.Get, new { id = "campground-search-box-form" }))
+{
+
+    <input type="text" class="campground-search-box-text" id="campground-small-searchterms" autocomplete="off" name="q" />
+    <label for="campground-small-searchterms">@T("Search.SearchBox.Tooltip")</label>
+
+    @await Component.InvokeAsync("Widget", new { widgetZone = "searchbox_before_search_button" })
+    <button class="btn waves-effect waves-light" type="submit" name="action">
+        <i class="material-icons">search</i>
+    </button>
+    if (Model.SearchTermMinimumLength > 0)
+    {
+        <script type="text/javascript">
+            $("#campground-search-box-form").submit(function(event) {
+                if ($("#campground-small-searchterms").val() == "") {
+                    alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("Search.EnterSearchTerms").Text))');
+                    $("#campground-small-searchterms").focus();
+                    event.preventDefault();
+                }
+            });
+        </script>
+    }
+    if (Model.AutoCompleteEnabled)
+    {
+        <text>
+        <script type="text/javascript">
+                $(document).ready(function() {
+                    $('#campground-small-searchterms').autocomplete({
+                            delay: 500,
+                            minLength: @(Model.SearchTermMinimumLength.ToString()),
+                            source: '@(Url.RouteUrl("CampgroundSearchAutoComplete"))',
+                            appendTo: '.search-box',
+                            select: function(event, ui) {
+                                $("#campground-small-searchterms").val(ui.item.label);
+                                setLocation(ui.item.campgroundurl);
+                                return false;
+                            }
+                        })
+                    .data("ui-autocomplete")._renderItem = function(ul, item) {
+                        var t = item.label;
+                        //html encode
+                        t = htmlEncode(t);
+                        return $("<li></li>")
+                            .data("ui-autocomplete-item", item)
+                            .append("<a><span>" + t + "</span></a>")
+                            .appendTo(ul);
+                    };
+                });
+        </script>
+        </text>
+    }
+    @await Component.InvokeAsync("Widget", new { widgetZone = "searchbox" })
+}

@@ -1,0 +1,62 @@
+@model CampgroundReviewsModel
+@{
+    Layout = "~/Plugins/Campgrounds/Views/Shared/_ColumnsOneAngular.cshtml";
+
+    //title
+    Html.AddTitleParts(!string.IsNullOrEmpty(Model.CampgroundName) ? Model.CampgroundName + " Reviews" : "Camping and Campground Reviews");
+    //meta
+    Html.AddMetaDescriptionParts("Reviews from users who are familiar with " + Model.CampgroundName + " campground or who have stayed at " + Model.CampgroundName);
+    Html.AddMetaKeywordParts(Model.CampgroundName + " camping reviews, reviews for camping at " + Model.CampgroundName + ", camping at " + Model.CampgroundName);    //page class
+
+    Html.AppendPageCssClassParts("html-campground-reviews-page");
+
+}
+
+<div class="page campground-reviews-page">
+    <div class="page-title">
+        <h1>
+            @T("Reviews.CampgroundReviewsFor")
+            <a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, CampgroundName = Model.CampgroundSeName })">@Model.CampgroundName</a>
+        </h1>
+    </div>
+    <div class="campground-review-box" id="addCampgroundReviews-@Model.CampgroundId" style="display:none;">
+        <app-campground-review campgroundId="@Model.CampgroundId">Loading...</app-campground-review>
+    </div>
+    <div>
+        <span>@await Component.InvokeAsync("CampgroundRating", new { campgroundId = Model.CampgroundId })</span> |
+        <span itemprop="reviewCount">@Model.Items.Count @T("Reviews.Overview.Reviews")</span>
+        <span> | <a class="btnAddReview" onclick="addReview(@Model.CampgroundId, false)">@T("Reviews.Overview.AddNew")</a></span>
+    </div>
+    <div class="page-body">
+        @await Component.InvokeAsync("Widget", new { widgetZone = "campgroundreviews_page_top", additionalData = Model.CampgroundId })
+        @if (Model.Items.Count > 0)
+        {
+            @await Component.InvokeAsync("CampgroundReviewContent", new { campgroundId = Model.CampgroundId })
+        }
+
+        @if (Model.AddCampgroundReview.SuccessfullyAdded)
+        {
+            <div class="result">
+                @Model.AddCampgroundReview.Result
+            </div>
+        }
+
+        @await Component.InvokeAsync("Widget", new { widgetZone = "campgroundreviews_page_bottom", additionalData = Model.CampgroundId })
+    </div>
+    <script type="text/javascript">
+        amzn_assoc_placement = "adunit0";
+        amzn_assoc_search_bar = "true";
+        amzn_assoc_tracking_id = "ct-news-post-20";
+        amzn_assoc_search_bar_position = "top";
+        amzn_assoc_ad_mode = "search";
+        amzn_assoc_ad_type = "smart";
+        amzn_assoc_marketplace = "amazon";
+        amzn_assoc_region = "US";
+        amzn_assoc_title = "Shop Related Campgrounds";
+        amzn_assoc_default_search_phrase = "Camping Chairs";
+        amzn_assoc_default_category = "SportingGoods";
+        amzn_assoc_linkid = "07927d758fb22f2862b389d093d3adf4";
+        amzn_assoc_default_browse_node = "3375251";
+    </script>
+    <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+</div>

@@ -1,0 +1,123 @@
+﻿@model CampgroundDetailModel
+@{
+    double ratingPercent = 0;
+    var ratingCSS = 0.0;
+    if (Model.CampgroundReviewOverviewModel.TotalReviews != 0)
+    {
+        ratingPercent = (double)(((Model.CampgroundReviewOverviewModel.RatingSum) / (decimal)(Model.CampgroundReviewOverviewModel.TotalReviews * 5)) * 5) * 2;
+        ratingCSS = Math.Round(ratingPercent, MidpointRounding.AwayFromZero);
+    }
+}
+@if (Model.ShowReviewRatingFrame)
+{
+    <div class="campground-rating campground-rating-@(ratingCSS)" title="@string.Format(T("Reviews.TotalReviews").Text, Model.CampgroundReviewOverviewModel.TotalReviews)">
+        <div class="campground-rating-stats hide-on-med-and-down">
+            <span class="campground-rating-stat" itemprop="ratingCount">@(ratingPercent > 0 ? String.Format("{0:0.0}", (ratingPercent / 2)) : string.Empty)</span>
+            <span class="campground-rating-label" itemprop="ratingValue">@(ratingPercent >= 7 ? "Excellent" : (ratingPercent < 7 && ratingPercent >= 3) ? "Average" : (ratingPercent < 3 && ratingPercent >= 1) ? "Poor" : "No Rating")</span>
+            @if (ratingPercent != 0)
+            {
+            <span class="campground-rating-add-review">
+                <a onclick="addReview(@Model.Id, false)">@T("Reviews.Overview.AddNew")</a>
+                @*<a href="@Url.RouteUrl("CampgroundReviews", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("Reviews.Overview.AddNew")</a>*@
+            </span>
+            }
+        </div>
+        <div class="campground-rating-stars">
+            <span>
+                @switch (ratingPercent)
+                {
+                    case var expression when ratingPercent >= 9.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-five-flames.png" alt="campground rating 5 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 8.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-four-half-flames.png" alt="campground rating 4.5 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 7.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-four-flames.png" alt="campground rating 4 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 6.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-three-half-flames.png" alt="campground rating 3.5 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 5.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-three-flames.png" alt="campground rating 3 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 4.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-two-half-flames.png" alt="campground rating 2.5 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 3.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-two-flames.png" alt="campground rating 2 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 2.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-one-half.png" alt="campground rating 1.5 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 1.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-one-flames.png" alt="campground rating 1 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    case var expression when ratingPercent >= 0.5:
+                        <img data-src="/Plugins/Campgrounds/Content/images/rating-half-flames.png" alt="campground rating .5 stars">
+                        <span class="campground-rating-show-review"><a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("CampgroundReviews.ShowReviews")</a></span>
+                        break;
+                    default:
+                        <span class="campground-no-reviews">
+                            <a onclick="addReview(@Model.Id, false)">@T("Reviews.Overview.AddNew")</a>
+                            @*<a href="@Url.RouteUrl("CampgroundReviews", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("Reviews.Overview.AddNew")</a>*@
+                        </span>
+                        break;
+                }
+            </span>
+        </div>
+    </div>
+}
+else
+{
+    <span>
+        @switch (ratingPercent)
+        {
+            case var expression when ratingPercent >= 9.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-five-flames.png" alt="campground rating 5 stars">
+                break;
+            case var expression when ratingPercent >= 8.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-four-half-flames.png" alt="campground rating 4.5 stars">
+                break;
+            case var expression when ratingPercent >= 7.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-four-flames.png" alt="campground rating 4 stars">
+                break;
+            case var expression when ratingPercent >= 6.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-three-half-flames.png" alt="campground rating 3.5 stars">
+                break;
+            case var expression when ratingPercent >= 5.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-three-flames.png" alt="campground rating 3 stars">
+                break;
+            case var expression when ratingPercent >= 4.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-two-half-flames.png" alt="campground rating 2.5 stars">
+                break;
+            case var expression when ratingPercent >= 3.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-two-flames.png" alt="campground rating 2 stars">
+                break;
+            case var expression when ratingPercent >= 2.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-one-half.png" alt="campground rating 1.5 stars">
+                break;
+            case var expression when ratingPercent >= 1.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-one-flames.png" alt="campground rating 1 stars">
+                break;
+            case var expression when ratingPercent >= 0.5:
+                <img data-src="/Plugins/Campgrounds/Content/images/rating-half-flames.png" alt="campground rating .5 stars">
+                break;
+            default:
+                <span class="campground-no-reviews">
+                    <a onclick="addReview(@Model.Id, false)">@T("Reviews.Overview.AddNew")</a>
+                    @*<a href="@Url.RouteUrl("CampgroundReviews", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })/#review-section">@T("Reviews.Overview.AddNew")</a>*@
+                </span>
+                break;
+        }
+    </span>
+}

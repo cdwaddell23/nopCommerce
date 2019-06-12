@@ -1,0 +1,25 @@
+﻿@model CampgroundModel.CampgroundAttributeMappingModel
+@inject Nop.Services.Events.IEventPublisher eventPublisher
+@using Nop.Web.Framework.Events
+
+<div asp-validation-summary="All"></div>
+<input asp-for="Id" type="hidden" />
+
+<div class="content">
+    <div class="form-horizontal">
+        <nop-tabs id="campground-attribute-mapping-edit">
+            <nop-tab asp-name="tab-info" asp-title="@T("Admin.Campgrounds.CampgroundAttributes.Attributes.Info")" asp-default="true">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdateCampgroundAttributeMapping.Info.cshtml", Model)</nop-tab>
+            <nop-tab asp-name="tab-values" asp-title="@T("Admin.Campgrounds.CampgroundAttributes.Attributes.Values")">@await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdateCampgroundAttributeMapping.Values.cshtml", Model)</nop-tab>
+        </nop-tabs>
+    </div>
+</div>
+
+@{
+    //custom tabs
+    var eventMessage = new AdminTabStripCreated(this.Html, "campground-attribute-mapping-edit");
+    eventPublisher.Publish(eventMessage);
+    foreach (var eventBlock in eventMessage.BlocksToRender)
+    {
+        @eventBlock
+    }
+}

@@ -1,0 +1,194 @@
+﻿@model CampgroundDetailModel
+@using System;
+@{
+
+}
+<div class="campground-review-box" id="addCampgroundReviews-@Model.Id" style="display:none;">
+    <app-campground-review campgroundId="@Model.Id">Loading...</app-campground-review>
+</div>
+
+<div id="campground-summary-card-@Model.Id" class="row campground-summary-card">
+    <div class="row">
+        <div class="col l9 m10">
+            <h5 itemprop="alternativeHeadline">@Model.Name @(Model.AvailableCampsites > 0 ? " - " + Model.AvailableCampsites.ToString() + " Campsites" : "")</h5>
+            @if (Model.Distance > 0)
+            {<h6>This campground is located @Math.Round(Model.Distance, 2) away<span class="red-text">** </span></h6>}
+            <ul class="nav nav-pills responsive hidden-xs hidden-sm">
+                <li class="active">
+                    <a data-toggle="tab" href="#campground_tab_@Model.Id" class="campground" data-listingid="@Model.Id" data-actionurl="/campground/getcampground" aria-expanded="true">
+                        @T("Campgrounds.Summay.Tab.Details")
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#amenities_tab_@Model.Id" class="amenities" data-listingid="@Model.Id" data-actionurl="/campground/getamenities" aria-expanded="true">
+                        @T("Campgrounds.Summay.Tab.Amenities")
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#activities_tab_@Model.Id" class="activities" data-listingid="@Model.Id" data-actionurl="/campground/getactivities" aria-expanded="true">
+                        @T("Campgrounds.Summay.Tab.Activities")
+                    </a>
+                </li>
+                <li>
+                    <a data-toggle="tab" href="#services_tab_@Model.Id" class="services" data-listingid="@Model.Id" data-actionurl="/campground/getservices" aria-expanded="true">
+                        @T("Campgrounds.Summay.Tab.Services")
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col l3 m2">
+            @if (Model.CampgroundReviewOverviewModel.AllowCampgroundReviews)
+            {
+                @await Component.InvokeAsync("CampgroundRating", new { model = Model })
+            }
+        </div>
+    </div>
+    <div class="row">
+        <div class="col l12 m12 s12">
+            <div class="row listing-item" id="campground_@Model.Id">
+                <div class="col l4 m5 no-padding campground_map_@Model.Id">
+                    <a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })" data-mapitemid="@Model.Id">
+                        <div class="img-overlay">
+                            @if (string.IsNullOrEmpty(Model.DefaultPictureModel.ImageUrl))
+                            {
+                                <img data-src="https://maps.googleapis.com/maps/api/staticmap?size=350x350&zoom=12&center=@Model.CampgroundAddress.Latitude,@Model.CampgroundAddress.Longitude&maptype=terrain&markers=icon:http%3A%2F%2Fwww.camptale.com%2Fthemes%2Fnopelectro%2Fcontent%2Fimages%2Fmaps%2Fcamping-logo.png|label:X|@Model.CampgroundAddress.Latitude,@Model.CampgroundAddress.Longitude&format=jpg&style=feature:road.highway%7Celement:geometry%7Cvisibility:simplified%7Ccolor:0xc280e9&style=feature:transit.line%7Cvisibility:simplified%7Ccolor:0xbababa&style=feature:road.highway%7Celement:labels.text.stroke%7Cvisibility:on%7Ccolor:0xb06eba&style=feature:road.highway%7Celement:labels.text.fill%7Cvisibility:on%7Ccolor:0xffffff&key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c" class="img-responsive img-property" alt="Campground overview map">
+                            }
+                            else
+                            {
+                                <img data-src="@Model.DefaultPictureModel.ImageUrl" class="img-responsive img-property" alt="@(string.IsNullOrEmpty(Model.DefaultPictureModel.AlternateText) ? "Picture of Campground or Camping" : Model.DefaultPictureModel.AlternateText)" itemprop="photo" />
+                            }
+                            @if (string.IsNullOrEmpty(Model.DefaultPictureModel.ThumbImageUrl))
+                            {
+                                <img data-src="https://maps.googleapis.com/maps/api/streetview?size=150x150&location=@Model.CampgroundAddress.Latitude,@Model.CampgroundAddress.Longitude&key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c" class="img-circle img-thumbnail campground-overlay" alt="Campground street view">
+                            }
+                            else if (Model.DefaultPictureModel.ImageUrl.Replace("450", "") != Model.DefaultPictureModel.ThumbImageUrl.Replace("150", ""))
+                            {
+                                <img data-src="@Model.DefaultPictureModel.ThumbImageUrl" class="img-circle img-thumbnail campground-overlay" alt="@(string.IsNullOrEmpty(Model.DefaultPictureModel.AlternateText) ? "Picture of Campground or Camping" : Model.DefaultPictureModel.AlternateText)" itemprop="photo" />
+                            }
+                        </div>
+                    </a>
+                </div>
+                <div class="tab-content col l8 m7 s12">
+                    <div id="campground_tab_@Model.Id" class="tab-pane fade active in">
+                        <p itemprop="text">@Html.Raw(Model.Description)</p>
+                        @if (Model.AvailableCampsites > 0)
+                        {
+                            <p>@(Model.AvailableCampsites <= 50 ? Html.Raw("This campground boasts to have <b>" + Model.AvailableCampsites + "</b> campsites available.") : Html.Raw("Camping is plentiful here with <b>" + Html.Raw(Model.AvailableCampsites) + "</b> sites available."))</p>
+                        }
+                        <div class="row right-align no-margin">
+                            @if (Model.RegistrationsEnabled)
+                            {
+                                <a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })" data-listingid="@Model.Id" class="btn btn-default">@T("Campgrounds.Summay.Reservations")</a>
+                            }
+                            else
+                            {
+                                <a href="@Url.RouteUrl("CampgroundDetail", new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })" data-listingid="@Model.Id" class="btn btn-default">@T("Campgrounds.Summay.NoReservations")</a>
+                            }
+                        </div>
+                    </div>
+                    <div id="amenities_tab_@Model.Id" class="tab-pane fade">
+                        <h6 id="amenities-@Model.Id">Amenities<span class="text-sm">*</span></h6>
+                        <ul>
+                            <li>
+                                Picnic table
+                            </li>
+                            <li>
+                                Fire Ring
+                            </li>
+                            <li>
+                                Potable water
+                            </li>
+                            <li>
+                                Wifi
+                            </li>
+                            <li>
+                                Pets Welcomed
+                            </li>
+                            <li>
+                                RV hookup
+                            </li>
+                            <li>
+                                RV sanitation
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="activities_tab_@Model.Id" class="tab-pane fade">
+                        <h6 id="activites-@Model.Id">Activities<span class="text-sm">*</span></h6>
+                        <ul>
+                            <li>
+                                Biking
+                            </li>
+                            <li>
+                                Boating
+                            </li>
+                            <li>
+                                Fishing
+                            </li>
+                            <li>
+                                Hiking
+                            </li>
+                            <li>
+                                Horseback riding
+                            </li>
+                            <li>
+                                Wind sports
+                            </li>
+                            <li>
+                                Climbing
+                            </li>
+                            <li>
+                                Snow sports
+                            </li>
+                            <li>
+                                Surfing
+                            </li>
+                            <li>
+                                Swimming
+                            </li>
+                            <li>
+                                Wildlife watching
+                            </li>
+                        </ul>
+                    </div>
+                    <div id="services_tab_@Model.Id" class="tab-pane fade">
+                        <h6 id="services-@Model.Id">Services<span class="text-sm">*</span></h6>
+                        <ul>
+                            <li>
+                                Laundry
+                            </li>
+                            <li>
+                                Playground
+                            </li>
+                            <li>
+                                Arcade
+                            </li>
+                            <li>
+                                General Store
+                            </li>
+                            <li>
+                                Firewood for Sale
+                            </li>
+                            <li>
+                                Site Rental
+                            </li>
+                            <li>
+                                Toilets
+                            </li>
+                            <li>
+                                Trash
+                            </li>
+                            <li>
+                                Showers
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <span class="red-text">* </span> Some but not all of these items are available at this site.
+            @if (Model.Distance > 0)
+            {
+                <text><br /><span class="red-text">** </span>Driving distance may be longer than distance shown.</text>
+            }
+        </div>
+    </div>
+</div>

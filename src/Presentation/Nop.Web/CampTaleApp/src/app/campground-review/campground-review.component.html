@@ -1,0 +1,68 @@
+CampgroundId={{campgroundId}}<br />
+<mat-horizontal-stepper [linear]="isLinear" #stepper="matHorizontalStepper">
+  <mat-step [stepControl]="ratingFormGroup" class="step-icon">
+    <form [formGroup]="ratingFormGroup" (ngSubmit)="addRevew(ratingCtrl.value)">
+      <ng-template matStepLabel>Rate Campground</ng-template>
+      <h3>How would you rate your time at {{campgroundReview.name}}</h3>
+      <div class="form-text large">
+        <div *ngIf="ratingCtrl.valid" class="text-success">Thanks!</div>
+        <div *ngIf="ratingCtrl.invalid" class="text-danger">Please rate campground</div>
+      </div>
+      <ng-template #t let-fill="fill">
+        <span class="star" [class.full]="fill === 100" style="padding-right: 10px;">
+          <span class="half" [style.width.%]="fill"><i class="icon ion-bonfire"></i></span><i class="icon ion-bonfire"></i>
+        </span>
+      </ng-template>
+      <ngb-rating [formControl]="ratingCtrl" [starTemplate]="t" max="5"></ngb-rating>
+      <div>
+        <button mat-button matStepperNext [disabled]="!ratingCtrl.valid">Next</button>
+        <button mat-button (click)="resetReview()" style="float: right;">Close</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="reviewFormGroup" class="step-icon">
+    <form [formGroup]="reviewFormGroup" (ngSubmit)="addRevew(reviewFormGroup.value)">
+      <ng-template matStepLabel>Tell Us About Your Visit</ng-template>
+      <h3>Write your review on {{campgroundReview.name}}</h3>
+      <mat-form-field>
+        <input matInput class="suppress" placeholder="Campground Review Title" [formControl]="reviewTitleCtrl" />
+      </mat-form-field>
+      <mat-form-field>
+        <textarea matInput placeholder="Campground Review" [formControl]="reviewBodyCtrl" rows="4" cols="50"></textarea>
+      </mat-form-field>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+        <button mat-button (click)="resetReview()" style="float: right;">Close</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step [stepControl]="picturesFormGroup" class="step-icon">
+    <form [formGroup]="picturesFormGroup">
+      <ng-template matStepLabel>Share pictures from your visit</ng-template>
+      <h3>Share pictures from your visit to {{campgroundReview.name}}</h3>
+      <image-upload name="campingPics" url="/camping/api/v1/campgrounds/review/add-photo/{{campgroundId}}/{{campgroundReview.reviewid}}" [max]="5" [buttonCaption]="'Add Pictures'" [class]="'customClass'" [clearButtonCaption]="'Remove Pictures'" [dropBoxMessage]="'Drop camping pictures inside dotted box! Share up to 5 photos.'" (removed)="onRemoved($event)" [uploadedFiles]="campgroundReview.pictures != null ? campgroundReview.pictures : ''"></image-upload>
+      <div>
+        <button mat-button matStepperPrevious>Back</button>
+        <button mat-button matStepperNext>Next</button>
+        <button mat-button (click)="resetReview()" style="float: right;">Close</button>
+      </div>
+    </form>
+  </mat-step>
+  <mat-step>
+    <ng-template matStepLabel>Share With Your Friends</ng-template>
+    <h3>Thank you for submitting your review! You are helping other campers by sharing your experiences! Try submitting another review or search for your next adventure!</h3>
+    Follow us on:
+    <ul>
+      <li class="social"><a href="https://www.instagram.com/camp_tale/" class="fa fa-instagram fa-3x" target="_blank" rel="noopener" title="Instagram"></a></li>
+      <li class="social"><a href="https://twitter.com/CampTale" class="fa fa-twitter fa-3x" target="_blank" rel="noopener" title="Twitter"></a></li>
+      <li class="social"><a href="http://www.facebook.com/CampTale" class="fa fa-facebook fa-3x" target="_blank" rel="noopener" title="Facebook"></a></li>
+      <li class="social"><a href="https://www.pinterest.com/camptale/" class="fa fa-pinterest fa-3x" target="_blank" rel="noopener" title="Pinterest"></a></li>
+    </ul>
+    <div>
+      <button mat-button matStepperPrevious>Back</button>
+      <button mat-button (click)="resetReview()" style="float: right;">Close</button>
+    </div>
+  </mat-step>
+</mat-horizontal-stepper>
+

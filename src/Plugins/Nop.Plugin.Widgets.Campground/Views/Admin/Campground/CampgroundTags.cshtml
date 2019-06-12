@@ -1,0 +1,133 @@
+﻿@inject Nop.Core.Domain.Common.AdminAreaSettings adminAreaSettings
+
+@{
+    var defaultGridPageSize = adminAreaSettings.DefaultGridPageSize;
+    var gridPageSizes = adminAreaSettings.GridPageSizes;
+
+    //page title
+    ViewBag.Title = T("Admin.Catalog.CampgroundTags").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Campground tags");
+}
+
+<form asp-controller="Campground" asp-action="CampgroundTags" method="post" id="campground-tags-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("Admin.Catalog.CampgroundTags")
+        </h1>
+        <div class="pull-right">
+            &nbsp;
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_tag_list_buttons" })
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="panel-group">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div id="campground-tags-grid"></div>
+
+                    <script type="text/javascript">
+                        $(document).ready(function() {
+                            $("#campground-tags-grid").kendoGrid({
+                                dataSource: {
+                                    type: "json",
+                                    transport: {
+                                        read: {
+                                            url: "@Html.Raw(Url.Action("CampgroundTags", "Campground"))",
+                                            type: "POST",
+                                            dataType: "json",
+                                            data: addAntiForgeryToken
+                                        },
+                                        destroy: {
+                                            url: "@Html.Raw(Url.Action("CampgroundTagDelete", "Campground"))",
+                                            type: "POST",
+                                            dataType: "json",
+                                            data: addAntiForgeryToken
+                                        }
+                                    },
+                                    schema: {
+                                        data: "Data",
+                                        total: "Total",
+                                        errors: "Errors",
+                                        model: {
+                                            id: "Id",
+                                            fields: {
+                                                Name: { editable: true, type: "string" },
+                                                Value: { editable: true, type: "string" },
+                                                Store: { editable: true, type: "string" },
+                                                StoreId: { editable: true, type: "number" },
+                                                Id: { editable: false, type: "number" }
+                                            }
+                                        }
+                                    },
+                                    requestEnd: function(e) {
+                                        if (e.type == "create" || e.type == "update") {
+                                            this.read();
+                                        }
+                                    },
+                                    error: function(e) {
+                                        display_kendoui_grid_error(e);
+                                        // Cancel the changes
+                                        this.cancelChanges();
+                                    },
+                                    pageSize: @(defaultGridPageSize),
+                                    serverPaging: true,
+                                    serverFiltering: true,
+                                    serverSorting: true
+                                },
+                                pageable: {
+                                    refresh: true,
+                                    pageSizes: [@(gridPageSizes)],
+                                    @await Html.PartialAsync("_GridPagerMessages")
+                                },
+                                editable: {
+                                    confirmation: "@T("Admin.Common.DeleteConfirmation")",
+                                    mode: "inline"
+                                },
+                                scrollable: false,
+                                columns: [
+                                    {
+                                        field: "Name",
+                                        title: "@T("Admin.Catalog.CampgroundTags.Fields.Name")",
+                                        width: 300
+                                    }, {
+                                        field: "CampgroundCount",
+                                        title: "@T("Admin.Catalog.CampgroundTags.Fields.CampgroundCount")",
+                                        width: 150
+                                    }, {
+                                        field: "Id",
+                                        title: "@T("Admin.Common.Edit")",
+                                        width: 150,
+                                        headerAttributes: { style: "text-align:center" },
+                                        attributes: { style: "text-align:center" },
+                                        template: "<button onclick=\"javascript:OpenWindow('@Url.Content("~/Admin/Campground/EditCampgroundTag/")#=Id#?btnId=btnRefresh&formId=campground-tags-form', 800, 320, true); return false;\" class='btn btn-default'><i class=\"fa fa-pencil\"></i>@T("Admin.Common.Edit")</button>"
+                                    }, {
+                                        command: { name: "destroy", text: "@T("Admin.Common.Delete")" },
+                                        headerAttributes: { style: "text-align:center" },
+                                        attributes: { style: "text-align:center" },
+                                        title: "@T("Admin.Common.Delete")",
+                                        width: 100
+                                    }
+                                ]
+                            });
+                        });
+                    </script>
+                    <input type="submit" id="btnRefresh" style="display: none"/>
+                    <script type="text/javascript">
+                        $(document).ready(function() {
+                            $('#btnRefresh').click(function() {
+                                //refresh grid
+                                var grid = $("#campground-tags-grid").data('kendoGrid');
+                                grid.dataSource.read();
+
+                                //return false to don't reload a page
+                                return false;
+                            });
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

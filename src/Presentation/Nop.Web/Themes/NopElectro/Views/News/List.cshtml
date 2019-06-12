@@ -1,0 +1,63 @@
+@model NewsItemListModel
+@{
+    Layout = "_ColumnsTwo";
+
+    //title
+    Html.AddTitleParts(T("PageTitle.NewsArchive").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-news-list-page");
+}
+<div class="page news-list-page">
+  <div class="page-title">
+    <a href="@Url.RouteUrl("NewsRSS", new { languageId = Model.WorkingLanguageId })" class="link-rss" title="@T("News.RSS.Hint")">@T("News.RSS")</a>
+    <h1>@T("News")</h1>
+  </div>
+  <div class="page-body">
+    @await Component.InvokeAsync("Widget", new { widgetZone = "newslist_page_before_items" })
+    <div class="news-items">
+      @foreach (var item in Model.NewsItems)
+      {
+        <div class="news-item">
+          <div class="news-head">
+            <a class="news-title" href="@Url.RouteUrl("NewsItem", new { SeName = item.SeName })">@item.Title</a>
+            <span class="news-date">-@item.CreatedOn.ToString("D")</span>
+          </div>
+          <div class="news-body">
+            @Html.Raw(item.Short)
+          </div>
+          <div class="buttons">
+            <a href="@Url.RouteUrl("NewsItem", new { SeName = item.SeName })" class="read-more">@T("News.MoreInfo")</a>
+          </div>
+          @await Component.InvokeAsync("Widget", new { widgetZone = "newslist_page_inside_item", additionalData = item.Id })
+        </div>
+      }
+    </div>
+    @{
+      var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
+    }
+    @if (!pager.IsEmpty())
+    {
+      <div class="pager">
+        @pager
+      </div>
+    }
+    @await Component.InvokeAsync("Widget", new { widgetZone = "newslist_page_after_items" })
+  </div>
+  <div class="row">
+    <script type="text/javascript">
+      amzn_assoc_placement = "adunit0";
+      amzn_assoc_search_bar = "true";
+      amzn_assoc_tracking_id = "ct-news-post-20";
+      amzn_assoc_search_bar_position = "top";
+      amzn_assoc_ad_mode = "search";
+      amzn_assoc_ad_type = "smart";
+      amzn_assoc_marketplace = "amazon";
+      amzn_assoc_region = "US";
+      amzn_assoc_title = "Shop Related Products";
+      amzn_assoc_default_search_phrase = "Tents";
+      amzn_assoc_default_category = "SportingGoods";
+      amzn_assoc_linkid = "b60e7ab3714bd59e4df4b4ac1ca269bf";
+      amzn_assoc_default_browse_node = "3375251";
+    </script>
+    <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+  </div>

@@ -1,0 +1,19 @@
+﻿@model CampgroundModel
+@using Nop.Plugin.Widgets.Campgrounds.Extensions
+@{ 
+
+    Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/js/camptale.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "//maps.googleapis.com/maps/api/js?key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c&libraries=places&callback=initMap", isAsync: true, excludeFromBundle: true);
+
+}
+<div class="panel-group">
+    @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_customer_details_addresses_top", additionalData = Model.Id })
+    <div class="panel panel-default">
+        <div class="panel-body">
+            @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Shared/_CampgroundAddress.cshtml", Model)
+        </div>
+        <div class="panel-footer">
+        </div>
+    </div>
+    @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_customer_details_addresses_bottom", additionalData = Model.Id })
+</div>

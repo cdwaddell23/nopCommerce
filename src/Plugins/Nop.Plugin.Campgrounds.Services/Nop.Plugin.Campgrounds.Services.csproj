@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <Authors>Dean Systems, Inc</Authors>
+    <Company>Dean Systems, Inc</Company>
+    <Description>Plugin creates the service layer needed to manage campgrounds.</Description>
+    <Copyright>Dean Systems, Inc</Copyright>
+    <Version>1.00</Version>
+    <AssemblyName>Nop.Plugin.Campgrounds.Services</AssemblyName>
+    <RootNamespace>Nop.Plugin.Campgrounds.Services</RootNamespace>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\Presentation\Nop.Web\Plugins\Campgrounds</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>D:\DeanSystems\dev.camptale.com\CampTale - CommercePlugin 4\Presentation\Nop.Web\Plugins\Campgrounds\</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+  </PropertyGroup>
+
+  <Target Name="NopTarget" AfterTargets="Build">
+    <!-- Delete unnecessary libraries from plugins path -->
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\..\Build\ClearPluginAssemblies.proj" Properties="PluginPath=$(MSBuildProjectDirectory)\$(OutDir)" Targets="NopClear" />
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Google.Apis" Version="1.33.0" />
+    <PackageReference Include="iTextSharp" Version="5.5.13" />
+    <PackageReference Include="MaxMind.GeoIP2" Version="3.0.0" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Libraries\Nop.Core\Nop.Core.csproj" />
+    <ProjectReference Include="..\..\Libraries\Nop.Data\Nop.Data.csproj" />
+    <ProjectReference Include="..\..\Libraries\Nop.Services\Nop.Services.csproj" />
+    <ProjectReference Include="..\Nop.Plugin.Campgrounds.Data\Nop.Plugin.Campgrounds.Data.csproj" />
+  </ItemGroup>
+
+</Project>

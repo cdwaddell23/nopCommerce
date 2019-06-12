@@ -1,0 +1,32 @@
+[
+  {
+    "outputFileName": "Content/css/materialize.min.css",
+    "inputFiles": [
+      "Content/css/materialize.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/css/campground-styles.min.css",
+    "inputFiles": [
+      "Content/css/campground-styles.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/css/styles.min.css",
+    "inputFiles": [
+      "Content/css/styles.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/css/animate.min.css",
+    "inputFiles": [
+      "Content/css/animate.css"
+    ]
+  },
+  {
+    "outputFileName": "Content/js/camptale.min.js",
+    "inputFiles": [
+      "Content/js/camptale.js"
+    ]
+  }
+]

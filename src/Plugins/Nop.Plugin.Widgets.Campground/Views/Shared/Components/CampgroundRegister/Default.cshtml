@@ -1,0 +1,15 @@
+﻿@model Int32
+@{
+}
+@*<div>
+    <span>@await Component.InvokeAsync("CampgroundRating", new { campgroundId = Model.CampgroundId })</span> |
+    <span itemprop="reviewCount">@Model.TotalReviews  @T("Reviews.Overview.Reviews")</span>
+    <span class="btnAddReview"> | <a onclick="addReview()">@T("Reviews.Overview.AddNew")</a></span>
+</div>
+<script asp-location="Footer">
+    function addReview() {
+        document.getElementById("addCampgroundReviews-@Model.CampgroundId").style.display = "block";
+        window.dispatchEvent(new CustomEvent('campgroundId', { detail: @Model.CampgroundId }));
+        $(".btnAddReview").hide();
+    }
+</script>*@

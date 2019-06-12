@@ -1,0 +1,37 @@
+﻿@model CampgroundModel
+
+@{
+    //page title
+    ViewBag.Title = T("admin.campgrounds.AddNew").Text;
+    //active menu item (system name)
+    Html.SetActiveMenuItemSystemName("Campgrounds");
+}
+
+<form asp-controller="Campground" asp-action="Create" method="post" id="campground-form">
+    <div class="content-header clearfix">
+        <h1 class="pull-left">
+            @T("admin.campgrounds.AddNew")
+            <small>
+                <i class="fa fa-arrow-circle-left"></i>
+                <a asp-action="List">@T("admin.campgrounds.BackToList")</a>
+            </small>
+        </h1>
+        <div class="pull-right">
+            <button type="submit" name="save" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.Save")
+            </button>
+            <button type="submit" name="save-continue" class="btn bg-blue">
+                <i class="fa fa-floppy-o"></i>
+                @T("Admin.Common.SaveContinue")
+            </button>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_details_buttons" })
+        </div>
+    </div>
+    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CreateOrUpdate.cshtml", Model)
+</form>
+@if (!Model.IsLoggedInAsCampgroundHost)
+{
+    //campground editor settings modal
+    @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Admin/Campground/_CampgroundEditorSettingsModal.cshtml", Model)
+}

@@ -1,0 +1,500 @@
+﻿@using Microsoft.AspNetCore.Http
+@using Nop.Core
+@model CampgroundModel
+@inject IWebHelper webHelper
+@inject IHttpContextAccessor httpContextAccessor
+
+<div id="campgroundsettings-window" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="campgroundsettings-window-title">
+    <div class="modal-dialog editor-settings-modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="campgroundsettings-window-title">
+                    @T("Admin.Configuration.Settings.CampgroundEditor.ModalTitle")
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Campground" asp-action="SaveCampgroundEditorSettings" method="post">
+                    <input type="hidden" name="returnurl" value="@webHelper.GetRawUrl(httpContextAccessor.HttpContext.Request)" />
+                    <div class="row">
+                        <div class="col-md-12">
+                            @T("Admin.Configuration.Settings.CampgroundEditor.ModalDescription")
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.CommonInfo")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.Id" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.Id" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.Id"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundType" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundType" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundType"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundTemplate" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundTemplate" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundTemplate"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.VisibleIndividually" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.VisibleIndividually" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.VisibleIndividually"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.Published" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.Published" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.Published"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundTags" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundTags" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundTags"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.ShowOnHomePage" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.ShowOnHomePage" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.ShowOnHomePage"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.DisplayOrder" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.DisplayOrder" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.DisplayOrder"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.AllowCampgroundReviews" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.AllowCampgroundReviews" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.AllowCampgroundReviews"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.AvailableStartDate" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.AvailableStartDate" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.AvailableStartDate"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.AvailableEndDate" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.AvailableEndDate" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.AvailableEndDate"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.MarkAsNew" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.MarkAsNew" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.MarkAsNew"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10"> 
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.MarkAsNewStartDate" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.MarkAsNewStartDate" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.MarkAsNewStartDate"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.MarkAsNewEndDate" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.MarkAsNewEndDate" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.MarkAsNewEndDate"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.AdminComment" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.AdminComment" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.AdminComment"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CreatedOn" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CreatedOn" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CreatedOn"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.UpdatedOn" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.UpdatedOn" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.UpdatedOn"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.AdvancedCampgroundTypes")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.RecurringCampground" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.RecurringCampground" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.RecurringCampground"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.IsRental" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.IsRental" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.IsRental"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.Price")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundCost" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundCost" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundCost"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.Discounts" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.Discounts" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.Discounts"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.DisableBuyButton" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.DisableBuyButton" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.DisableBuyButton"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.DisableWishlistButton" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.DisableWishlistButton" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.DisableWishlistButton"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.Shipping")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.Mappings")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundHost" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundHost" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundHost"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="panel-group">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.Inventory")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundAvailabilityRange" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundAvailabilityRange" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundAvailabilityRange"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.AllowBackInStockSubscriptions" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.AllowBackInStockSubscriptions" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.AllowBackInStockSubscriptions"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.AllowAddingOnlyExistingAttributeCombinations" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.AllowAddingOnlyExistingAttributeCombinations" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.AllowAddingOnlyExistingAttributeCombinations"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.Security")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.ACL" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.ACL" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.ACL"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.LinkedCampgrounds")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.RequireOtherCampgroundsAddedToTheCart" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.RequireOtherCampgroundsAddedToTheCart" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.RequireOtherCampgroundsAddedToTheCart"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.RelatedCampgrounds" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.RelatedCampgrounds" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.RelatedCampgrounds"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CrossSellsCampgrounds" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CrossSellsCampgrounds" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CrossSellsCampgrounds"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel panel-default">
+                                    <div class="panel-heading clearfix">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                @T("Admin.Configuration.Settings.CampgroundEditor.BlockTitle.Tabs")
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input type="checkbox" class="select-all-fields" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.Seo" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.Seo" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.Seo"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.OneColumnCampgroundPage" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.OneColumnCampgroundPage" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.OneColumnCampgroundPage"></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.CampgroundAttributeTypes" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.CampgroundAttributeTypes" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.CampgroundAttributeTypes"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-10">
+                                                <nop-label asp-for="CampgroundEditorSettingsModel.SpecificationAttributes" />
+                                            </div>
+                                            <div class="col-md-2">
+                                                <nop-editor asp-for="CampgroundEditorSettingsModel.SpecificationAttributes" />
+                                                <span asp-validation-for="CampgroundEditorSettingsModel.SpecificationAttributes"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12 text-center margin-t-5">
+                            <button type="submit" name="save-campground-editor-settings" class="btn btn-lg bg-light-blue">Save</button>
+                        </div>
+                    </div>
+                </form>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $('input[type=checkbox].select-all-fields').each(function (index, value) {
+                            if ($('input[type=checkbox]:checked', $(this).closest('.panel')).length > 0) {
+                                $(this).attr('checked', true);
+                            }
+                        });
+
+                        $('input[type=checkbox].select-all-fields').on('click', function () {
+                            $('input[type=checkbox]', $(this).closest('.panel')).attr('checked', $(this).is(':checked'));
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>

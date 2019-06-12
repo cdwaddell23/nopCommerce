@@ -1,0 +1,26 @@
+﻿@model SocialModel
+<ul>
+    <li class="social"><a href="https://www.instagram.com/camp_tale/" class="fa fa-instagram fa-3x" target="_blank" rel="noopener" title="@T("Footer.FollowUs.Instagram")"></a></li>
+    @if (!string.IsNullOrEmpty(Model.TwitterLink))
+    {
+        <li class="social"><a href="@Model.TwitterLink" class="fa fa-twitter fa-3x" target="_blank" rel="noopener" title="@T("Footer.FollowUs.Twitter")"></a></li>
+    }
+    @if (!string.IsNullOrEmpty(Model.FacebookLink))
+    {
+        <li class="social"><a href="@Model.FacebookLink" class="fa fa-facebook fa-3x" target="_blank" rel="noopener" title="@T("Footer.FollowUs.Facebook")"></a></li>
+    }
+    <li class="social"><a href="https://www.pinterest.com/camptale/" class="fa fa-pinterest fa-3x" target="_blank" rel="noopener" title="@T("Footer.FollowUs.Pinterest")"></a></li>
+    @if (Model.NewsEnabled)
+    {
+        <li class="social"><a href="@Url.RouteUrl("NewsRSS", new {languageId = Model.WorkingLanguageId})" class="fa fa-rss fa-3x" title="@T("Footer.FollowUs.Rss")"></a></li>
+    }
+    @if (!string.IsNullOrEmpty(Model.YoutubeLink))
+    {
+        <li class="social"><a href="@Model.YoutubeLink" target="_blank" rel="noopener">@T("Footer.FollowUs.Youtube")</a></li>
+    }
+    @if (!string.IsNullOrEmpty(Model.GooglePlusLink))
+    {
+        <li class="social"><a href="@Model.GooglePlusLink" target="_blank" rel="noopener">@T("Footer.FollowUs.GooglePlus")</a></li>
+    }
+</ul>
+<div>Join our social platforms</div>

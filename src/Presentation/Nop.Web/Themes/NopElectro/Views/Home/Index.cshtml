@@ -1,0 +1,322 @@
+@{
+    Layout = "_ColumnsOne";
+
+    //page class
+    Html.AppendPageCssClassParts("html-home-page");
+}
+<div class="page home-page">
+    <div class="page-body">
+      <div class="content">
+        @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_top" })
+        <div class="thumb-box1">
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp">
+                <div class="thumb-pad1">
+                  <div class="thumbnail">
+                    <div class="badge"><a href="@Url.RouteUrl("Campgrounds")" name="@T("homepage.splashbanner.zone1")" title="@T("homepage.splashbanner.zone1")"><span class="fa fa-search"></span></a></div>
+                    <div class="caption">
+                      <a href="@Url.RouteUrl("Campgrounds")" name="@T("homepage.splashbanner.zone1")" title="@T("homepage.splashbanner.zone1")">@T("homepage.splashbanner.zone1")</a>
+                      <p>@T("homepage.splashbanner.zone1.description")</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="thumb-pad1">
+                  <div class="thumbnail">
+                    <div class="badge"><a href="/blog" name="@T("homepage.splashbanner.zone3")" title="@T("homepage.splashbanner.zone3")"><span class="fa fa-book"></span></a></div>
+                    <div class="caption">
+                      <a href="/blog" name="@T("homepage.splashbanner.zone3")" title="@T("homepage.splashbanner.zone3")">@T("homepage.splashbanner.zone3")</a>
+                      <p>@T("homepage.splashbanner.zone3.description")</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.1s">
+                <div class="thumb-pad1">
+                  <div class="thumbnail">
+                    <div class="badge"><a href="/boards" name="@T("homepage.splashbanner.zone2")" title="@T("homepage.splashbanner.zone2")"><span class="fa fa-comments"></span></a></div>
+                    <div class="caption">
+                      <a href="/boards" name="@T("homepage.splashbanner.zone2")" title="@T("homepage.splashbanner.zone2")">@T("homepage.splashbanner.zone2")</a>
+                      <p>@T("homepage.splashbanner.zone2.description")</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.3s">
+                <div class="thumb-pad1">
+                  <div class="thumbnail">
+                    <div class="badge"><a href="/vendor/apply" name="@T("homepage.splashbanner.zone4")" title="@T("homepage.splashbanner.zone4")"><span class="fa fa-tree"></span></a></div>
+                    <div class="caption">
+                      <a href="/vendor/apply" name="@T("homepage.splashbanner.zone4")" title="@T("homepage.splashbanner.zone4")">@T("homepage.splashbanner.zone4")</a>
+                      <p>@T("homepage.splashbanner.zone4.description")</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="thumb-box2">
+          <div class="container">
+            <h1 class="title wow fadeInDown">@T("homepage.welcome.message")</h1>
+            <h2 class="sub-title wow fadeInDown">@T("homepage.welcome.tag")</h2>
+            <div class="row">
+              <div class="col-lg-6 col-md-6 col-sm-6 wow fadeInLeft">
+                @await Component.InvokeAsync("TopicBlock", new { systemName = "HomePageText" })
+              </div>
+              <div class="col-lg-6 col-md-6 col-sm-6 wow fadeInRight">
+                @await Component.InvokeAsync("TopicBlock", new { systemName = "CampTale-New-Column" })
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="thumb-box3">
+          <div class="container">
+            @await Component.InvokeAsync("NewCampgrounds")
+          </div>
+        </div>
+        <div class="thumb-box4">
+          <div class="container">
+            @await Component.InvokeAsync("CampingBlogs")
+          </div>
+        </div>
+        <div class="thumb-box3">
+          <div class="container">
+            @await Component.InvokeAsync("HomepagePolls")
+          </div>
+        </div>
+        @*<div class="thumb-box3">
+        <div class="container">
+            <p class="title wow fadeInDown">Hire a Camper Trailer</p>
+            <p class="description wow fadeInUp">We offer you the best of both worlds with our convenient Camper Trailer Hire service available through all agents.</p>
+            <a href="#" class="btn-default btn2 wow fadeInUp">Learn More</a>
+        </div>
+    </div>
+    <div class="thumb-box4">
+        <div class="container">
+            <p class="title wow fadeInDown">Latest from the blog</p>
+            <div class="row">
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img1.jpg"><i></i><img src="img/page1_pic1.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img2.jpg"><i></i><img src="img/page1_pic2.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img3.jpg"><i></i><img src="img/page1_pic3.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img4.jpg"><i></i><img src="img/page1_pic4.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img5.jpg"><i></i><img src="img/page1_pic5.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img6.jpg"><i></i><img src="img/page1_pic6.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img7.jpg"><i></i><img src="img/page1_pic7.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp" data-wow-delay="0.3s">
+                    <div class="thumb-pad2">
+                        <div class="thumbnail">
+                            <figure><a href="img/img8.jpg"><i></i><img src="img/page1_pic8.jpg" alt=""></a></figure>
+                            <div class="caption">
+                                <p class="title">Ato primis in faucibus orci luctus</p>
+                                <p class="lnk"><a href="#">25 comments</a> <span>|</span> <a href="#">12, August 2014</a></p>
+                                <p>Aenean nec eros. Vestibuluprimis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspein velit sed leo. Ut pharetra augue nec augue. </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="thumb-box5">
+        <div class="container">
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_before_poll" })
+            @await Component.InvokeAsync("HomepagePolls")
+        </div>
+    </div>
+    <div class="thumb-box6">
+        <div class="container">
+            @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_before_news" })
+            @await Component.InvokeAsync("HomepageNews")
+        </div>
+    </div>
+    <div class="stellar-section">
+        <div class="thumb-box7" data-stellar-background-ratio="0">
+            <div class="container">
+                <p class="title wow fadeInDown" data-wow-delay="0.2s">Contact us</p>
+                <ul class="follow_icon3 wow fadeInDown">
+                    <li><a href="#" class="fa fa-google-plus"></a></li>
+                    <li><a href="#" class="fa fa-twitter"></a></li>
+                    <li><a href="#" class="fa fa-facebook"></a></li>
+                    <li><a href="#" class="fa fa-pinterest"></a></li>
+                    <li><a href="#" class="fa fa-linkedin"></a></li>
+                </ul>
+                <div class="row">
+                    <div class="col-lg-10 col-lg-offset-1">
+                        <div class="contactForm2">
+                            <form id="contact-form">
+                                <div class="contact-form-loader"></div>
+                                <fieldset>
+                                    <label class="name form-div-1">
+                                        <input type="text" name="name" placeholder="First Name" value="" data-constraints="    />
+                                        <span class="empty-message">*This field is required.</span>
+                                        <span class="error-message">*This is not a valid name.</span>
+                                    </label>
+                                    <label class="email form-div-2">
+                                        <input type="text" name="name" placeholder="Last Name" value="" data-constraints="" />
+                                        <span class="empty-message">*This field is required.</span>
+                                        <span class="error-message">*This is not a valid name.</span>
+                                    </label>
+                                    <label class="message form-div-4">
+                                        <textarea name="message" placeholder="Message" data-constraints=''></textarea>
+                                        <span class="empty-message">*This field is required.</span>
+                                        <span class="error-message">*The message is too short.</span>
+                                    </label>
+                                    <!-- <label class="recaptcha"><span class="empty-message">*This field is required.</span></label> -->
+                                    <div class="btns">
+                                        <a href="#" data-type="submit" class="btn-default btn5">Send Your Message</a>
+                                    </div>
+                                </fieldset>
+                                <div class="modal fade response-message">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                                <h4 class="modal-title">Modal title</h4>
+                                            </div>
+                                            <div class="modal-body">
+                                                You message has been sent! We will be in touch soon.
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+      </div>
+                @*@await Component.InvokeAsync("Widget", new { widgetZone = "home_page_before_categories" })
+            @await Component.InvokeAsync("HomepageCategories")*@
+
+                @*@await Component.InvokeAsync("Widget", new { widgetZone = "home_page_before_products" })
+            @await Component.InvokeAsync("HomepageProducts")*@
+
+                @*@await Component.InvokeAsync("Widget", new { widgetZone = "home_page_before_best_sellers" })
+            @await Component.InvokeAsync("HomepageBestSellers")*@
+
+                @await Component.InvokeAsync("Widget", new { widgetZone = "home_page_bottom" })
+            </div>
+        </div>
+
+<script type="text/javascript">
+
+    $(window).load(function () {
+        function handleOwlCarouselControl(element, show) {
+            if (show) {
+                $(element).find('.owl-controls').show();
+            }
+            else {
+                $(element).find('.owl-controls').hide();
+            }
+        }
+
+        var owl0 = $(".home-page .owl-carousel");
+        owl0.on('initialized.owl.carousel', function (event) {
+            handleOwlCarouselControl(event.target, event.page.count > 1);
+        });
+        owl0.on('resized.owl.carousel', function (event) {
+            handleOwlCarouselControl(event.target, event.page.count > 1);
+        });
+        owl0.owlCarousel({
+            responsive: {
+                0: {
+                    items: 1
+                },
+                600: {
+                    items: 2
+                },
+                900: {
+                    items: 3
+                },
+                1000: {
+                    items: 5
+                }
+            },
+            nav: true,
+        });
+    });
+</script>
+

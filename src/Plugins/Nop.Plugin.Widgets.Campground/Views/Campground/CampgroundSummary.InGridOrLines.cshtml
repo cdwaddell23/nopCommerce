@@ -1,0 +1,239 @@
+@model CampgroundOverviewModel
+@using Nop.Core.Domain.Common
+@using Nop.Core.Domain.Seo
+@using Nop.Plugin.Widgets.Campgrounds.Mapping
+@using System.Device.Location
+@inject SeoSettings seoSettings
+@inject CommonSettings commonSettings
+@{
+    Layout = "~/Plugins/Campgrounds/Views/Shared/_ColumnsOneAngular.cshtml";
+    Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/js/camptale.min.js");
+    Html.AddScriptParts(ResourceLocation.Footer, "//maps.googleapis.com/maps/api/js?key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c&callback=initMap", isAsync: true, excludeFromBundle: true);
+
+    //title
+    Html.AddTitleParts(!string.IsNullOrEmpty(Model.MetaTitle) ? Model.MetaTitle : Model.Name + " Campgrounds");
+    //meta
+    Html.AddMetaDescriptionParts(!string.IsNullOrEmpty(Model.MetaDescription) ? Model.MetaDescription : "Search over " + Model.NumberOfCampgrounds + "  campgrounds in " + Model.Name + ".");
+    Html.AddMetaKeywordParts(!string.IsNullOrEmpty(Model.MetaKeywords) ? Model.MetaKeywords : Model.Name + " campgrounds, camping in " + Model.Name + ", tent camping around " + Model.Name + ", rv camping, car camping, campsites, " + Model.Name + " campgrounds");
+    //page class
+    Html.AppendPageCssClassParts("html-campground-page");
+
+    if (seoSettings.CanonicalUrlsEnabled)
+    {
+        var campgroundUrl = Url.RouteUrl("CampgroundCategories", new { SeName = Model.SeName }, this.Url.ActionContext.HttpContext.Request.Scheme);
+        Html.AddCanonicalUrlParts(campgroundUrl, seoSettings.QueryStringInCanonicalUrlsEnabled);
+    }
+
+    var breadcrumbDelimiter = commonSettings.BreadcrumbDelimiter;
+    var campgroundCoordinates = new List<GeoCoordinate>();
+    var mapPoints = new List<MapPoints>();
+}
+@functions
+{
+public virtual GeoCoordinate GetCentralGeoCoordinate(IList<GeoCoordinate> geoCoordinates)
+{
+    if (geoCoordinates.Count == 1)
+    {
+        return geoCoordinates.Single();
+    }
+
+    double x = 0;
+    double y = 0;
+    double z = 0;
+
+    foreach (var geoCoordinate in geoCoordinates)
+    {
+        var latitude = geoCoordinate.Latitude * Math.PI / 180;
+        var longitude = geoCoordinate.Longitude * Math.PI / 180;
+
+        x += Math.Cos(latitude) * Math.Cos(longitude);
+        y += Math.Cos(latitude) * Math.Sin(longitude);
+        z += Math.Sin(latitude);
+    }
+
+    var total = geoCoordinates.Count;
+
+    x = x / total;
+    y = y / total;
+    z = z / total;
+
+    var centralLongitude = Math.Atan2(y, x);
+    var centralSquareRoot = Math.Sqrt(x * x + y * y);
+    var centralLatitude = Math.Atan2(z, centralSquareRoot);
+
+    return new GeoCoordinate(centralLatitude * 180 / Math.PI, centralLongitude * 180 / Math.PI);
+}
+}
+
+@using Nop.Web.Extensions;
+@{
+    var pager = Html.Pager(Model.PagingFilteringContext).QueryParam("pagenumber");
+    var i = 1;
+}
+<style>
+    body.modal-open[style] {
+        padding-right: 0px !important;
+    }
+</style>
+<div class="campground">
+    <div class="row">
+        <div class="col m12">
+            @switch (Model.ParentCategoryId)
+            {
+                case -1:
+                    <h1 class="title" itemprop="headline">@Model.Name</h1>
+                    <h2 class="sub-title" itemprop="alternativeHeadline">We found @String.Format("{0:n0}", Model.NumberOfCampgrounds) campgrounds that meet your search criteria.</h2>
+                    break;
+                case 0:
+                    <h1 class="title" itemprop="headline">Featured Campgrounds</h1>
+                    break;
+                default:
+                    <h1 class="title" itemprop="headline">@Model.Name Campgrounds</h1>
+                    <h2 class="sub-title" itemprop="alternativeHeadline">Search over @String.Format("{0:n0}", Model.NumberOfCampgrounds) campgrounds by name or location.</h2>
+                    break;
+            }
+        </div>
+    </div>
+    @if (Model.Campgrounds.Count() > 0)
+    {
+        <div id="topMap" class="row">
+            <div class="col s12">
+                <div id="map_top" class="large_map"></div>
+            </div>
+        </div>
+    }
+    <div class="row">
+        <div class="col l6 m6 s12 pull-left">
+            @await Component.InvokeAsync("SearchCampgrounds", new { categoryId = Model.Id })
+            @if (Model.Description.Length > 25)
+            {
+                <div class="row campground-summary-card">
+                    <div class="row">
+                        <div class="col l12 m12 s12">
+                            <div class="listing-item" itemprop="description">
+                                @if (Model.DefaultPictureModel != null)
+                                {
+                                    <div class="col l4 m5 no-padding">
+                                        <img alt="@Model.DefaultPictureModel.AlternateText" src="@Model.DefaultPictureModel.ImageUrl" title="@Model.DefaultPictureModel.Title" itemprop="image" id="main-campground-category-img-@Model.Id" />
+                                    </div>
+                                    <div class="tab-content col l8 m7 s12">
+                                        @Html.Raw(@Model.Description)
+                                    </div>
+                                }
+                                else
+                                {
+                                    @Html.Raw(@Model.Description)
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            @*<div class="campground-selectors">
+            @Html.Partial("~/Plugins/Campgrounds/Views/Shared/_CampgroundSelectors.cshtml", Model.PagingFilteringContext, new ViewDataDictionary(ViewData))
+        </div>*@
+            @if (!pager.IsEmpty())
+            {
+                <div class="pager right-align">
+                    @pager
+                </div>
+            }
+
+            @foreach (var item in Model.Campgrounds)
+            {
+                if (item.CampgroundAddress.Latitude != null && item.CampgroundAddress.Longitude != null)
+                {
+                    campgroundCoordinates.Add(new GeoCoordinate((double)item.CampgroundAddress.Latitude, (double)item.CampgroundAddress.Longitude));
+                    mapPoints.Add(new MapPoints(item.Id.ToString(), item.Name, item.Description, new GeoCoordinate((double)item.CampgroundAddress.Latitude, (double)item.CampgroundAddress.Longitude)));
+                }
+                @Html.Partial("~/Plugins/Campgrounds/Views/Shared/_CampgroundTile.cshtml", item)
+                @if (i == 4)
+                {
+                    <div class="row campground-summary-card">
+                        <div class="row">
+                            <script type="text/javascript">
+                                amzn_assoc_placement = "adunit0";
+                                amzn_assoc_search_bar = "true";
+                                amzn_assoc_search_bar_position = "bottom";
+                                amzn_assoc_tracking_id = "ct-news-post-20";
+                                amzn_assoc_ad_mode = "search";
+                                amzn_assoc_ad_type = "smart";
+                                amzn_assoc_marketplace = "amazon";
+                                amzn_assoc_region = "US";
+                                amzn_assoc_title = "Shop Camping Products";
+                                amzn_assoc_default_search_phrase = "Blackstone camp stove";
+                                amzn_assoc_default_category = "All";
+                                amzn_assoc_linkid = "3478ddde7ba2024bccf65fb71d22a424";
+                            </script>
+                            <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+                        </div>
+                    </div>
+                }
+                @if (i == 8)
+                {
+                    <div class="row campground-summary-card">
+                        <div class="row">
+                            <div id="amzn-assoc-ad-e02ed4d3-89fb-4489-a59a-6d58a7bffd01"></div>
+                            <script async src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US&adInstanceId=e02ed4d3-89fb-4489-a59a-6d58a7bffd01"></script>
+                        </div>
+                    </div>
+                }
+                i++;
+            }
+            @if (!pager.IsEmpty())
+            {
+                <div class="pager right-align">
+                    @pager
+                </div>
+            }
+        </div>
+                        <div class="col l6 m6 pull-right">
+                            @if (Model.ParentCategoryId == 0 || Model.Campgrounds.Count() == 0)
+                            {
+                                <h5>Campground by State</h5>
+                                @await Component.InvokeAsync("CampgroundMenu", new { topMenu = false })
+                            }
+                            else
+                            {
+                                <div id="map_side" class="large_map"></div>
+                            }
+                            <hr />
+                            <script type="text/javascript">
+                                amzn_assoc_placement = "adunit0";
+                                amzn_assoc_search_bar = "true";
+                                amzn_assoc_tracking_id = "ct-overview-20";
+                                amzn_assoc_search_bar_position = "top";
+                                amzn_assoc_ad_mode = "search";
+                                amzn_assoc_ad_type = "smart";
+                                amzn_assoc_marketplace = "amazon";
+                                amzn_assoc_region = "US";
+                                amzn_assoc_title = "Shop Related Products";
+                                amzn_assoc_default_search_phrase = "Tents";
+                                amzn_assoc_default_category = "All";
+                                amzn_assoc_linkid = "ab1a1fc7606651beeeac7576ce64fe90";
+                            </script>
+                            <script src="//z-na.amazon-adsystem.com/widgets/onejs?MarketPlace=US"></script>
+                            <ins class="adsbygoogle"
+                                 style="display:block"
+                                 data-ad-client="ca-pub-3544167684134058"
+                                 data-ad-slot="9388058609"
+                                 data-ad-format="auto"></ins>
+                            <script>
+                                (adsbygoogle = window.adsbygoogle || []).push({});
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+<script type="text/javascript" asp-location="Head">
+    function initMap() {
+        @foreach(var mapPoint in mapPoints) {
+            <text>
+        this.locations.push(['@mapPoint.Name', '@mapPoint.Description', @mapPoint.CampgroundLocation.Latitude, @mapPoint.CampgroundLocation.Longitude, @mapPoint.Id]);</text>
+        }
+        this.mapZoom = 10;
+        this.campgroundLatLng = { lat: @GetCentralGeoCoordinate(campgroundCoordinates).Latitude, lng: @GetCentralGeoCoordinate(campgroundCoordinates).Longitude };
+        initOverviewMap();
+        showSmallSearchAd();
+    }
+</script>

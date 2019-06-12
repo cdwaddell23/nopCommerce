@@ -1,0 +1,237 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net471</TargetFramework>
+    <Authors>Dean Systems, Inc</Authors>
+    <Company>Dean Systems, Inc</Company>
+    <Description>Plugin allows customers to browse, review and manage bookings for campgrounds</Description>
+    <Copyright>Dean Systems, Inc</Copyright>
+    <Version>1.00</Version>
+    <AssemblyName>Nop.Plugin.Widgets.Campgrounds</AssemblyName>
+    <RootNamespace>Nop.Plugin.Widgets.Campgrounds</RootNamespace>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <OutputPath>..\..\Presentation\Nop.Web\Plugins\Campgrounds\</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputPath>..\..\Presentation\Nop.Web\Plugins\Campgrounds\</OutputPath>
+    <OutDir>$(OutputPath)</OutDir>
+  </PropertyGroup>
+  
+  <!-- This target execute after "Build" target -->
+  <Target Name="NopTarget" AfterTargets="Build">
+    <!-- Delete unnecessary libraries from plugins path -->
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\..\Build\ClearPluginAssemblies.proj" Properties="PluginPath=$(MSBuildProjectDirectory)\$(OutDir)" Targets="NopClear" />
+  </Target>
+  <ItemGroup>
+    <Compile Remove="Migrations\**" />
+    <EmbeddedResource Remove="Migrations\**" />
+    <None Remove="Migrations\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="Validators\CampgroundEmailAFriendValidator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="logo.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="plugin.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Views\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!--<ItemGroup>
+    <Content Remove="Content\photoswipe\default-skin\default-skin.css" />
+    <Content Remove="Content\photoswipe\default-skin\default-skin.png" />
+    <Content Remove="Content\photoswipe\default-skin\default-skin.svg" />
+    <Content Remove="Content\photoswipe\default-skin\preloader.gif" />
+    <Content Remove="Content\photoswipe\photoswipe-ui-default.js" />
+    <Content Remove="Content\photoswipe\photoswipe-ui-default.min.js" />
+    <Content Remove="Content\photoswipe\photoswipe.css" />
+    <Content Remove="Content\photoswipe\photoswipe.js" />
+    <Content Remove="Content\photoswipe\photoswipe.min.js" />
+    <Content Remove="Views\Admin\Campground\ve-A4FF.tmp" />
+  </ItemGroup>-->
+
+  <ItemGroup>
+    <None Remove="Content\css\campground-styles.css" />
+    <None Remove="Content\css\campground-styles.min.css" />
+    <None Remove="Content\css\media.css" />
+    <None Remove="Content\css\styles.css" />
+    <None Remove="Content\css\styles.min.css" />
+    <None Remove="Content\js\camptaleApp\camptaleApp.js" />
+    <None Remove="Views\Admin\CampgroundAttribute\Create.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\Edit.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\List.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\PredefinedCampgroundAttributeValueCreatePopup.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\PredefinedCampgroundAttributeValueEditPopup.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\_CreateOrUpdate.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\_CreateOrUpdate.Info.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\_CreateOrUpdate.PredefinedValues.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\_CreateOrUpdate.UsedByCampgrounds.cshtml" />
+    <None Remove="Views\Admin\CampgroundAttribute\_CreateOrUpdatePredefinedCampgroundAttributeValue.cshtml" />
+    <None Remove="Views\Admin\Campground\AddressCreate.cshtml" />
+    <None Remove="Views\Admin\Campground\AddressEdit.cshtml" />
+    <None Remove="Views\Admin\Campground\Create.cshtml" />
+    <None Remove="Views\Admin\Campground\Edit.cshtml" />
+    <None Remove="Views\Admin\Campground\List.cshtml" />
+    <None Remove="Views\Admin\Campground\ve-A4FF.tmp" />
+    <None Remove="Views\Admin\Campground\_CreateOrUpdate.CampgroundAddresses.cshtml" />
+    <None Remove="Views\Admin\Campground\_CreateOrUpdate.cshtml" />
+    <None Remove="Views\Admin\Campground\_CreateOrUpdate.Info.cshtml" />
+    <None Remove="Views\Admin\Campground\_CreateOrUpdate.Pictures.cshtml" />
+    <None Remove="Views\Admin\Campground\_CreateOrUpdate.SEO.cshtml" />
+    <None Remove="Views\Admin\Campground\_CreateOrUpdateAddress.cshtml" />
+    <None Remove="Views\Admin\CampgroundReview\Edit.cshtml" />
+    <None Remove="Views\Admin\CampgroundReview\List.cshtml" />
+    <None Remove="Views\Admin\CampgroundReview\_CreateOrUpdate.cshtml" />
+    <None Remove="Views\CampgroundApi\AddPhoto.cshtml" />
+    <None Remove="Views\Campground\CampgroundClient.cshtml" />
+    <None Remove="Views\Campground\CampgroundNearby.cshtml" />
+    <None Remove="Views\Campground\CampgroundRegister.cshtml" />
+    <None Remove="Views\Campground\Campgrounds.cshtml" />
+    <None Remove="Views\Campground\Offline.cshtml" />
+    <None Remove="Views\Shared\Components\CampgroundMenu\Default.cshtml" />
+    <None Remove="Views\Shared\Components\CampgroundRating\default.cshtml" />
+    <None Remove="Views\Shared\Components\CampgroundRegister\default.cshtml" />
+    <None Remove="Views\Shared\Components\CampgroundReviewContent\Default.cshtml" />
+    <None Remove="Views\Shared\Components\CampgroundReview\Default.cshtml" />
+    <None Remove="Views\Shared\Components\CampingBlogs\Default.cshtml" />
+    <None Remove="Views\Shared\Components\CampingNearby\Default.cshtml" />
+    <None Remove="Views\Shared\Components\NewCampgrounds\Default.cshtml" />
+    <None Remove="Views\Shared\Components\SearchCampgrounds\Default.cshtml" />
+    <None Remove="Views\Shared\_campgroundSearchBox.cshtml" />
+    <None Remove="Views\Shared\_CampgroundTile.cshtml" />
+    <None Remove="Views\Shared\_CampgroundTileSmall.cshtml" />
+    <None Remove="Views\Shared\_ColumnsOneAngular.cshtml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Presentation\Nop.Web.Framework\Nop.Web.Framework.csproj" />
+    <ProjectReference Include="..\..\Presentation\Nop.Web\Nop.Web.csproj" />
+    <ProjectReference Include="..\Nop.Plugin.Campgrounds.Data\Nop.Plugin.Campgrounds.Data.csproj" />
+    <ProjectReference Include="..\Nop.Plugin.Campgrounds.Services\Nop.Plugin.Campgrounds.Services.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="4.8.0" />
+    <PackageReference Include="jQuery" Version="3.3.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.0.2" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Device">
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="System.Web" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Content\css\campground-styles.min.css">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Content\css\campground-styles.css">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\Edit.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\List.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\PredefinedCampgroundAttributeValueCreatePopup.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\PredefinedCampgroundAttributeValueEditPopup.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\_CreateOrUpdate.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\_CreateOrUpdate.Info.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\_CreateOrUpdate.PredefinedValues.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\_CreateOrUpdate.UsedByCampgrounds.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundAttribute\_CreateOrUpdatePredefinedCampgroundAttributeValue.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\AddressCreate.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\AddressEdit.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\Edit.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\List.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\_CreateOrUpdate.CampgroundAddresses.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\_CreateOrUpdate.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\_CreateOrUpdate.Info.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\_CreateOrUpdate.Pictures.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\_CreateOrUpdate.SEO.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\Campground\_CreateOrUpdateAddress.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundReview\Edit.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundReview\List.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\CampgroundReview\_CreateOrUpdate.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Admin\_ViewStart.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Campground\CampgroundNearby.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Shared\Components\CampgroundReview\Default.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Shared\Components\CampingBlogs\Default.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Shared\Components\NewCampgrounds\Default.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Update="Views\Shared\_CampgroundAddress.cshtml">
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+</Project>

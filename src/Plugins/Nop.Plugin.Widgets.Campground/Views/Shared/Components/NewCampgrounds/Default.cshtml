@@ -1,0 +1,23 @@
+﻿@model IList<CampgroundDetailModel>
+@if (Model.Count > 0)
+{
+    var i = 0;
+<div class="home-page-campgrounds-grid">
+    <div class="title">
+        <strong>@T("HomePage.NewCampgrounds")</strong>
+    </div>
+    <div class='row'>
+        @foreach (var item in Model)
+        {
+            if (i > 0 && i % 4 == 0)
+            {
+                @Html.Raw("</div>")
+                @Html.Raw("<div class='row'>")
+            }
+
+            @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Shared/_CampgroundTileSmall.cshtml", item)
+            i++;
+        }
+    </div>
+</div>
+}

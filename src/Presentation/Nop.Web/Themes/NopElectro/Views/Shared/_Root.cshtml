@@ -1,0 +1,71 @@
+@{
+    Layout = "_Root.Head";
+}
+@await Component.InvokeAsync("Widget", new { widgetZone = "body_start_html_tag_after" })
+@await Html.PartialAsync("_Notifications")
+@await Html.PartialAsync("_JavaScriptDisabledWarning")
+@await Html.PartialAsync("_OldInternetExplorerWarning")
+
+@{
+    var isOnePageCheckout = @Context.Request.Path == "/onepagecheckout" ? true : false;
+}
+<div class="master-wrapper-page" id="@(isOnePageCheckout ? "secure-page" : "")">
+    @await Html.PartialAsync("_Header")
+    <div class="master-wrapper-page-inner">
+        <script type="text/javascript" asp-location="Footer">
+            AjaxCart.init(false, '.header-links .cart-qty', '.header-links .wishlist-qty', '#flyout-cart');
+
+            $(document).ready(function () {
+                //Product Box Title
+                var productTitle = $('.product-grid .item-box .product-title');
+
+                productTitle.each(function () {
+                    $(this).dotdotdot({
+                        watch: true
+                    });
+                });
+            });
+        </script>
+        <div class="master-wrapper-content">
+            @await Component.InvokeAsync("Widget", new { widgetZone = "content_before" })
+
+            @if (IsSectionDefined("Breadcrumb"))
+            {
+                @RenderSection("Breadcrumb")
+            }
+            <div class="master-column-wrapper">
+                @RenderBody()
+            </div>
+            @await Component.InvokeAsync("Widget", new { widgetZone = "content_after" })
+        </div>
+        @await Component.InvokeAsync("Footer")
+    </div>
+</div>
+<script>
+    //if ('serviceWorker' in navigator) {
+    //    window.addEventListener('load', function () {
+    //        navigator.serviceWorker.register('/sw.min.js').then(function (registration) {
+    //            // Registration was successful
+    //            console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    //        }, function (err) {
+    //            // registration failed :(
+    //            console.log('ServiceWorker registration failed: ', err);
+    //        });
+    //    });
+    //}
+    $('.master-wrapper-page-inner').css('margin-top', $('header').outerHeight());
+    $(window).resize(function () {
+        $('.master-wrapper-page-inner').css('margin-top', $('header').outerHeight());
+    });
+    $(document).ready(function () {
+        //$('select').material_select();
+        [].forEach.call(document.querySelectorAll('img[data-src]'), function (img) {
+            img.setAttribute('src', img.getAttribute('data-src'));
+            img.onload = function () {
+                img.removeAttribute('data-src');
+            };
+        });
+    });
+</script>
+@await Component.InvokeAsync("EuCookieLaw")
+@await Component.InvokeAsync("Widget", new { widgetZone = "body_end_html_tag_before" })

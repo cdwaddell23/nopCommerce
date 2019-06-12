@@ -1,0 +1,34 @@
+﻿@await Component.InvokeAsync("Widget", new { widgetZone = "header_before" })
+<header>
+    @await Component.InvokeAsync("AdminHeaderLinks")
+    <div class="row header-upper">
+        <div class="header-logo col m2">
+            @await Component.InvokeAsync("Logo")
+        </div>
+        @*<div class="header-selectors-wrapper">
+            @await Component.InvokeAsync("TaxTypeSelector")
+            @await Component.InvokeAsync("CurrencySelector")
+            @await Component.InvokeAsync("LanguageSelector")
+            @await Component.InvokeAsync("Widget", new { widgetZone = "header_selectors" })
+        </div>*@
+        <div class="header-menu col m6">
+            @await Component.InvokeAsync("TopMenu")
+        </div>
+        <div class="header-links-wrapper col m4">
+            @await Component.InvokeAsync("HeaderLinks")
+            @await Component.InvokeAsync("FlyoutShoppingCart")
+        </div>
+    </div>
+    @await Component.InvokeAsync("Widget", new { widgetZone = "header_middle" })
+    @*<div class="header">
+            <div class="header-lower">
+                <div class="header-logo">
+                    @await Component.InvokeAsync("Logo")
+                </div>
+                <div class="search-box store-search-box">
+                    @await Component.InvokeAsync("SearchBox")
+                </div>
+            </div>
+        </div>*@
+    @await Component.InvokeAsync("Widget", new { widgetZone = "header_after" })
+</header>

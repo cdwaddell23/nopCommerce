@@ -1,0 +1,201 @@
+﻿@using System.Text.Encodings.Web
+@using Nop.Web.Extensions
+@using Nop.Core;
+@using Nop.Core.Infrastructure;
+@model CampgroundRegisterModel
+@{
+    Layout = "~/Plugins/Campgrounds/Views/Shared/_ColumnsOneAngular.cshtml";
+    if (!Model.DisableFormInput)
+    {
+        Html.AddScriptParts(ResourceLocation.Footer, "~/plugins/campgrounds/content/js/camptale.min.js");
+        Html.AddScriptParts(ResourceLocation.Footer, "//maps.googleapis.com/maps/api/js?key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c&libraries=places&callback=initMap", isAsync: true, excludeFromBundle: true);
+    }
+
+    //title
+    Html.AddTitleParts(T("PageTitle.CampgroundRegister.Apply").Text);
+    //page class
+    Html.AppendPageCssClassParts("html-apply-campground-page");
+
+
+    bool isRegistered = EngineContext.Current.Resolve<IWorkContext>().CurrentCustomer.CustomerRoles.Select(x => x.Name == "Registered").Contains(true);
+}
+<div class="page apply-campground-page">
+    <div class="modal"><app-campground-photo>Loading...</app-campground-photo></div>
+    <div class="page-title">
+        <h1>@T("PageTitle.CampgroundRegister.Apply")</h1>
+    </div>
+    @if (isRegistered)
+    {
+        <div class="page-body">
+            @await Component.InvokeAsync("TopicBlock", new { systemName = "ApplyCampgroundRegister" })
+            @await Component.InvokeAsync("Widget", new { widgetZone = "applycampground_top" })
+            @if (Model.DisableFormInput)
+            {
+                <div class="result message-error">
+                    @Html.Raw(Model.Result)
+
+                </div>
+            }
+            else
+            {
+                @if (Model.Campgrounds.Count > 0)
+                {
+                    <div class="result message-error">
+                        <h5 class="center-align">@Html.Raw(Model.Result)</h5>
+                    </div>
+                    <table class="table table-striped table-hover" style="width:75%">
+                        <thead>
+                            <tr>
+                                <th scope="col">Campground Name</th>
+                                <th scope="col">Website</th>
+                                <th scope="col">City</th>
+                                <th scope="col">State</th>
+                                <th scope="col">Zip</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.Campgrounds)
+                            {
+                                <tr>
+                                    <th scope="row">@item.Name</th>
+                                    <td>@item.Website</td>
+                                    <td>@item.CampgroundAddress.City</td>
+                                    <td>@item.CampgroundAddress.StateProvince.Name</td>
+                                    <td>@item.CampgroundAddress.ZipPostalCode</td>
+                                    <td><input type="button" id="claim-campground-@item.Id" ng-click="Claim(@item.Id)" name="claim-campground-@item.Id" class="button-1 apply-campground-button" value="@T("CampgroundRegister.ClaimCampground.Button")" /></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                <form asp-route="CampgroundRegister" method="post" enctype="multipart/form-data" class="form-horizontal">
+                    <div asp-validation-summary="ModelOnly" class="message-error"></div>
+                    <div class="fieldset">
+                        <div class="form-fields" @if (Model.Campground.CampgroundAddress.Latitude == null) { <text> ng-controller="campgroundRegistrationController" </text> }>
+                            @{
+                                var dataDictAddress = new ViewDataDictionary(ViewData);
+                                dataDictAddress.TemplateInfo.HtmlFieldPrefix = "Campground";
+                                @await Html.PartialAsync("~/Plugins/Campgrounds/Views/Shared/_CampgroundAddress.cshtml", Model.Campground, dataDictAddress)
+                            }
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="title">
+                                        <strong>@T("CampgroundRegister.section.information")</strong>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-3">
+                                            <nop-label asp-for="Campground.Website" />
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input asp-for="Campground.Website" class="name" placeholder="@T("CampgroundRegister.Website.Hint")" ng-model="Campground.Website" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-3">
+                                            <nop-label asp-for="Campground.AvailableCampsites" />
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input asp-for="Campground.AvailableCampsites" class="name" placeholder="@T("CampgroundRegister.AvailableCampsites.Hint")" ng-model="Campground.AvailableCampsites" />
+                                            <nop-required />
+                                            <span asp-validation-for="Campground.AvailableCampsites"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-3">
+                                            <div class="label-wrapper">
+                                                <label class="control-label">@T("CampgroundRegister.Picture")</label>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-9">
+                                            <input name="uploadedFile" type="file" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-md-3">
+                                            <nop-label asp-for="Campground.ShortDescription" />
+                                        </div>
+                                        <div class="col-md-9">
+                                            <textarea asp-for="Campground.ShortDescription" class="description" ng-model="Campground.Description"></textarea>
+                                            <nop-required />
+                                            <span asp-validation-for="Campground.ShortDescription"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="fieldset">
+                        <div class="form-fields">
+                            @if (Model.DisplayCaptcha)
+                            {
+                                <div class="captcha-box">
+                                    <nop-captcha />
+                                </div>
+                            }
+                            @if (Model.TermsOfServiceEnabled)
+                            {
+                                <script type="text/javascript" asp-location="Footer">
+                                $(document).ready(function() {
+                                    $('#apply-campground').click(function() {
+                                        if ($('#termsofservice').is(':checked')) {
+                                            //do some stuff
+                                            return true;
+                                        } else {
+                                            //just show validation errors, dont post
+                                            alert('@Html.Raw(JavaScriptEncoder.Default.Encode(T("CampgroundRegister.AcceptTermsOfService.Required").Text))');
+                                            return false;
+                                        }
+                                    });
+
+                                });
+                                </script>
+                                <div class="terms-of-service">
+                                    <input id="termsofservice" type="checkbox" name="termsofservice" />
+                                    <label for="termsofservice">@T("CampgroundRegister.AcceptTermsOfService")</label>
+                                    @if (Model.TermsOfServicePopup)
+                                    {
+                                        <span class="read" id="read-acceptterms">@T("CampgroundRegister.AcceptTermsOfService.Read")</span>
+                                        <script type="text/javascript" asp-location="Footer">
+                                        $(document).ready(function() {
+                                            $('#read-acceptterms').on('click',
+                                                function (e) {
+                                                    displayPopupContentFromUrl(
+                                                        '@Url.RouteUrl("TopicPopup", new { SystemName = "VendorTermsOfService" })',
+                                                        '@T("CampgroundRegister.AcceptTermsOfService")');
+                                                });
+                                        });
+                                        </script>
+                                    }
+                                    else
+                                    {
+                                        <a class="read" id="read-acceptterms" href="@Url.RouteUrl("Topic", new { SeName = Html.GetTopicSeName("CampgroundTermsOfService") })">@T("CampgroundRegister.AcceptTermsOfService.Read")</a>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <input type="submit" id="apply-campground" name="apply-campground" class="button-1 apply-campground-button" value="@T("CampgroundRegister.Button")" />
+                    </div>
+                </form>
+                <script>
+                    function initMap() {
+                        this.mapZoom = 4;
+                        this.mapType = 'terrain';
+                        initAddressMap();
+                    }
+                </script>
+            }
+        </div>
+        @await Component.InvokeAsync("Widget", new { widgetZone = "applycampground_bottom" })
+    }
+    else
+    {
+        <div class="page-body alert alert-danger">
+            <h5 class="error">Sorry, you must <a href="@Url.RouteUrl("Register")">@T("Account.Register")</a> or <a href="@Url.RouteUrl("Login")">@T("Account.Login")</a> before adding a campground.</h5>
+            <span style="padding:20px;"><a href="@Url.RouteUrl("Register")" class="btn btn-link">@T("Account.Register")</a></span><span style="padding:20px;"><a href="@Url.RouteUrl("Login")" class="btn btn-link">@T("Account.Login")</a></span>
+        </div>
+    }
+</div>
+

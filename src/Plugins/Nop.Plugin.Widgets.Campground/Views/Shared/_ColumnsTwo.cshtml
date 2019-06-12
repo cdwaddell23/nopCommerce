@@ -1,0 +1,56 @@
+﻿@{
+    Layout = "~/Views/Shared/_Root.cshtml";
+
+    //Html.AddScriptParts(ResourceLocation.Footer, "https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js");
+    Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/Campgrounds/Content/css/campground-styles.css");
+    Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/Campgrounds/Content/css/materialize.css");
+    Html.AddCssFileParts(ResourceLocation.Head, "~/Plugins/Campgrounds/Content/css/chosen.css");
+    Html.AddCssFileParts(ResourceLocation.Head, "https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css");
+}
+@{
+    //current category ID
+    var currentCategoryId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("catalog", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("category", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCategoryId = Convert.ToInt32(Url.ActionContext.RouteData.Values["categoryId"].ToString());
+    }
+
+    //current campground ID
+    var currentCampgroundId = 0;
+    if (Url.ActionContext.RouteData.Values["controller"].ToString().Equals("campground", StringComparison.InvariantCultureIgnoreCase) &&
+        Url.ActionContext.RouteData.Values["action"].ToString().Equals("campgrounddetails", StringComparison.InvariantCultureIgnoreCase))
+    {
+        currentCampgroundId = Convert.ToInt32(Url.ActionContext.RouteData.Values["campgroundId"].ToString());
+    }
+
+}
+@if (IsSectionDefined("Breadcrumb"))
+{
+    @section Breadcrumb {
+        @RenderSection("Breadcrumb")
+    } 
+}
+<div class="side-2">
+    @if (IsSectionDefined("left"))
+    {
+        @RenderSection("left")
+    }
+    else
+    {
+        @await Component.InvokeAsync("Widget", new { widgetZone = "left_side_column_before" })
+        @await Component.InvokeAsync("CategoryNavigation", new { currentCategoryId = currentCategoryId, currentCampgroundId = currentCampgroundId })
+        @await Component.InvokeAsync("Widget", new { widgetZone = "left_side_column_after_category_navigation" })
+        @await Component.InvokeAsync("ManufacturerNavigation", new { currentManufacturerId = currentManufacturerId })
+        @await Component.InvokeAsync("VendorNavigation")
+        @await Component.InvokeAsync("RecentlyViewedCampgroundsBlock", new { campgroundThumbPictureSize = 64 })
+        @await Component.InvokeAsync("PopularCampgroundTags")
+        @await Component.InvokeAsync("PollBlock", new { systemKeyword = "LeftColumnPoll" })
+        @await Component.InvokeAsync("Widget", new { widgetZone = "left_side_column_after" })
+    }
+</div>
+<div class="center-2">
+    @await Component.InvokeAsync("Widget", new { widgetZone = "main_column_before" })
+    @RenderBody()
+    @await Component.InvokeAsync("Widget", new { widgetZone = "main_column_after" })
+</div>

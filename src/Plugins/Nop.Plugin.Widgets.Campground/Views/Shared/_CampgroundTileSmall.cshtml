@@ -1,0 +1,56 @@
+﻿@model CampgroundDetailModel
+@{
+    var routeName = Model.RegistrationsEnabled ? "CampgroundRegistration" : "CampgroundDetail";
+}
+<div id="campground-homepage-card-@Model.Id" class="col-lg-3 col-md-3 col-sm-6 col-xs-6 wow fadeInUp animated" style="visibility: visible; animation-name: fadeInUp;">
+    <div class="thumb-pad2">
+        <div class="thumbnail">
+            <figure>
+                @if (string.IsNullOrEmpty(Model.DefaultPictureModel.ImageUrl))
+                {
+                    <a href="@Url.RouteUrl(routeName, new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })" data-listingid="@Model.Id">
+                        <img src="https://maps.googleapis.com/maps/api/staticmap?size=288x215&zoom=12&center=@Model.CampgroundAddress.Latitude,@Model.CampgroundAddress.Longitude&maptype=terrain&markers=icon:http%3A%2F%2Fwww.camptale.com%2Fthemes%2Fnopelectro%2Fcontent%2Fimages%2Fmaps%2Fcamping-logo.png|label:X|@Model.CampgroundAddress.Latitude,@Model.CampgroundAddress.Longitude&format=jpg&style=feature:road.highway%7Celement:geometry%7Cvisibility:simplified%7Ccolor:0xc280e9&style=feature:transit.line%7Cvisibility:simplified%7Ccolor:0xbababa&style=feature:road.highway%7Celement:labels.text.stroke%7Cvisibility:on%7Ccolor:0xb06eba&style=feature:road.highway%7Celement:labels.text.fill%7Cvisibility:on%7Ccolor:0xffffff&key=AIzaSyBatV_B_a-477kd8IN_wmvDEbJdIF9LQ8c" class="img-responsive img-property img-campground-md" alt="Campground overview map">
+                    </a>
+                }
+                else
+                {
+                    <a href="@Url.RouteUrl(routeName, new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })" data-listingid="@Model.Id">
+                        <img src="@Model.DefaultPictureModel.ImageUrl" class="img-responsive img-property img-campground-md" alt="@(string.IsNullOrEmpty(Model.DefaultPictureModel.AlternateText) ? "Picture of Campground or Camping" : Model.DefaultPictureModel.AlternateText)" itemprop="photo" />
+                    </a>
+                }
+            </figure>
+            <div class="caption">
+                <h5>@Model.Name</h5>
+                @if (!String.IsNullOrEmpty(Model.Website))
+                {
+                    <p class="lnk"><a href="http://@Model.Website" target="_blank" rel="noopener">@Model.Website</a></p>
+                }
+                @(Model.AvailableCampsites > 0 ? Html.Raw("<h6>" + Model.AvailableCampsites.ToString() + " Campsites</h6>") : Html.Raw(""))
+                @if (Model.Distance > 0)
+                {<h6>This campground is located @Math.Round(Model.Distance, 2) away<span class="red-text">** </span></h6>}
+                <p>@Html.Raw(Model.Description.Length > 100 ? Model.Description.Substring(0, 100) + "..." : Model.Description)</p>
+                @if (Model.AvailableCampsites > 0)
+                {
+                    <p>@(Model.AvailableCampsites <= 50 ? Html.Raw("This campground boasts to have <b>" + Model.AvailableCampsites + "</b> campsites available.") : Html.Raw("Camping is plentiful here with <b>" + Html.Raw(Model.AvailableCampsites) + "</b> sites available."))</p>
+                }
+                <div class="row center">
+                    <a href="@Url.RouteUrl(routeName, new { SeName = Model.SeName, campgroundSeName = Model.CampgroundSeName })" data-listingid="@Model.Id" class="btn btn-default">
+                        @if (Model.RegistrationsEnabled)
+                        {
+                            @T("Campgrounds.Summay.Reservations.Small")
+                        }
+                        else
+                        {
+                            @T("Campgrounds.Summay.NoReservations.Small")
+                        }
+                    </a>
+                </div>
+            </div>
+            @if (Model.Distance > 0)
+            {
+                <text><br /><span class="red-text">** </span>Driving distance may be longer than distance shown.</text>
+            }
+
+        </div>
+    </div>
+</div>

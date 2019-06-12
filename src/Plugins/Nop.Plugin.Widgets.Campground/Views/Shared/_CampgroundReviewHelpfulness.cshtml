@@ -1,0 +1,42 @@
+﻿@model CampgroundReviewHelpfulnessModel
+<div class="campground-review-helpfulness">
+    <span class="question">@T("Reviews.Helpfulness.WasHelpful?")</span>
+    <span class="vote-options">
+        <span id="vote-yes-@(Model.CampgroundReviewId)" class="vote">@T("Common.Yes")</span>
+        <span id="vote-no-@(Model.CampgroundReviewId)" class="vote">@T("Common.No")</span>
+    </span>
+    <span class="vote-stats">
+        (<span id="helpfulness-vote-yes-@(Model.CampgroundReviewId)">@(Model.HelpfulYesTotal)</span>/<span id="helpfulness-vote-no-@(Model.CampgroundReviewId)">@(Model.HelpfulNoTotal)</span>)
+    </span>
+    <span id="helpfulness-vote-result-@(Model.CampgroundReviewId)" class="result"></span>
+
+    <script type="text/javascript" asp-location="Footer">
+        $(document).ready(function () {
+            $('#vote-yes-@(Model.CampgroundReviewId)').click(function () {
+                setCampgroundReviewHelpfulness@(Model.CampgroundReviewId)('true');
+            });
+            $('#vote-no-@(Model.CampgroundReviewId)').click(function () {
+                setCampgroundReviewHelpfulness@(Model.CampgroundReviewId)('false');
+            });
+        });
+
+        function setCampgroundReviewHelpfulness@(Model.CampgroundReviewId)(wasHelpful){
+            $.ajax({
+                cache: false,
+                type: "POST",
+                url: "@(Url.RouteUrl("SetCampgroundReviewHelpfulness"))",
+                data: { "campgroundReviewId": @(Model.CampgroundReviewId), "washelpful": wasHelpful },
+                success: function (data) {
+                    $("#helpfulness-vote-yes-@(Model.CampgroundReviewId)").html(data.TotalYes);
+                    $("#helpfulness-vote-no-@(Model.CampgroundReviewId)").html(data.TotalNo);
+                    $("#helpfulness-vote-result-@(Model.CampgroundReviewId)").html(data.Result);
+                                                  
+                    $('#helpfulness-vote-result-@(Model.CampgroundReviewId)').fadeIn("slow").delay(1000).fadeOut("slow");
+                },
+                error:function (xhr, ajaxOptions, thrownError){
+                    alert('Failed to vote. Please refresh the page and try one more time.');
+                }  
+            });
+        }
+    </script>
+</div>

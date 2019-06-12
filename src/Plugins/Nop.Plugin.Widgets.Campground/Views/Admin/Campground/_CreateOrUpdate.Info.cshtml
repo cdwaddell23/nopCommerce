@@ -1,0 +1,935 @@
+﻿@model CampgroundModel
+@inject IStoreService storeService
+@inject ICampgroundTagService campgroundTagService
+@using Nop.Plugin.Campgrounds.Data.Domain;
+@using Nop.Services.Catalog;
+@using System.Text;
+@using System.Text.Encodings.Web
+@using Nop.Services
+@using Nop.Services.Stores
+@{
+    var stores = storeService.GetAllStores();
+
+    //resources for campground tags input
+    Html.AppendCssFileParts("~/lib/tagEditor/jquery.tag-editor.css");
+    Html.AppendScriptParts("~/lib/tagEditor/jquery.tag-editor.min.js");
+    Html.AppendScriptParts("~/lib/tagEditor/jquery.caret.min.js");
+}
+<script type="text/javascript">
+    $(document).ready(function() {
+        @if (!Model.IsLoggedInAsCampgroundHost)
+        {
+            <text>$("#@Html.IdFor(model => model.ShowOnHomePage)").click(toggleShowOnHomePage);</text>
+        }
+
+        $("#@Html.IdFor(model => model.RequireOtherCampgrounds)").click(toggleRequireOtherCampgrounds);
+        $("#@Html.IdFor(model => model.MarkAsNew)").click(toggleMarkAsNew);
+
+        @if (!Model.IsLoggedInAsCampgroundHost)
+        {
+            <text>toggleShowOnHomePage();</text>
+        }
+        toggleRequireOtherCampgrounds();
+        toggleMarkAsNew();
+    });
+
+    function toggleShowOnHomePage() {
+        if ($('#@Html.IdFor(model => model.ShowOnHomePage)').is(':checked')) {
+            $('#pnlDisplayOrder').show();
+        } else {
+            $('#pnlDisplayOrder').hide();
+        }
+    }
+
+    function toggleRequireOtherCampgrounds() {
+        if ($('#@Html.IdFor(model => model.RequireOtherCampgrounds)').is(':checked')) {
+            $('#pnlRequiredCampgroundIds').show();
+            $('#pnlAutomaticallyAddRequiredCampgrounds').show();
+        } else {
+            $('#pnlRequiredCampgroundIds').hide();
+            $('#pnlAutomaticallyAddRequiredCampgrounds').hide();
+        }
+    }
+
+    function toggleMarkAsNew() {
+        if ($('#@Html.IdFor(model => model.MarkAsNew)').is(':checked')) {
+            $('#pnlMarkAsNewStartDateTimeUtc').show();
+            $('#pnlMarkAsNewEndDateTimeUtc').show();
+        } else {
+            $('#pnlMarkAsNewStartDateTimeUtc').hide();
+            $('#pnlMarkAsNewEndDateTimeUtc').hide();
+        }
+    }
+
+    @{
+        //TODO move to Model
+        var campgroundTags = campgroundTagService.GetAllCampgroundTags();
+        var campgroundTagsSb = new StringBuilder();
+        campgroundTagsSb.Append("var initialCampgroundTags = [");
+        for (var i = 0; i < campgroundTags.Count; i++)
+        {
+            var tag = campgroundTags[i];
+            campgroundTagsSb.Append("'");
+            campgroundTagsSb.Append(JavaScriptEncoder.Default.Encode(tag.Name));
+            campgroundTagsSb.Append("'");
+            if (i != campgroundTags.Count - 1)
+            {
+                campgroundTagsSb.Append(",");
+            }
+        }
+        campgroundTagsSb.Append("]");
+    }
+
+    //tags
+    $(document).ready(function() {
+        @Html.Raw(campgroundTagsSb.ToString())
+        $("#@Html.IdFor(model => model.CampgroundTags)").tagEditor({
+            autocomplete: {
+                delay: 0,
+                position: { collision: 'flip' },
+                source: initialCampgroundTags
+            },
+            delimiter: ',',
+            placeholder: '@T("Admin.Campgrounds.Fields.CampgroundTags.Placeholder")'
+        });
+    });
+
+    //required campground friendly names
+    $(document).ready(function() {
+        loadRequiredCampgroundFriendlyNames();
+    });
+
+    $(document).ready(function() {
+        $('#@Html.IdFor(model => model.RequiredCampgroundIds)')
+            .data('timeout', null)
+            .keyup(function() {
+                clearTimeout($(this).data('timeout'));
+                //one second timeout
+                $(this).data('timeout', setTimeout(loadRequiredCampgroundFriendlyNames, 1000));
+            });
+    });
+
+    function loadRequiredCampgroundFriendlyNames() {
+        var inputValue = $('#@Html.IdFor(model => model.RequiredCampgroundIds)').val();
+        if (inputValue) {
+            //load friendly names
+            $('#required-campgrounds-check-progress').show();
+
+            var postData = {
+                campgroundIds: inputValue
+            };
+            addAntiForgeryToken(postData);
+
+            $.ajax({
+                cache: false,
+                type: 'POST',
+                url: '@Url.Action("LoadCampgroundFriendlyNames", "Campground")',
+                data: postData,
+                dataType: 'json',
+                success: function(data) {
+                    $('#required-campgrounds-check-progress').hide();
+                    $('#required-campground-names').text(data.Text);
+                },
+                failure: function() {
+                    $('#required-campgrounds-check-progress').hide();
+                    $('#required-campground-names').text('');
+                }
+            });
+        } else {
+            $('#required-campground-names').text('');
+        }
+    }
+</script>
+<div class="raw clearfix">
+    <div class="@(Model.CampgroundEditorSettingsModel.OneColumnCampgroundPage ? "col-md-12" : "col-md-7")">
+        <div class="panel-group">
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_details_info_column_left_top", additionalData = Model.Id })
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.CommonInfo")
+                </div>
+                <div class="panel-body">
+                    @if (Model.Id > 0)
+    {
+                <div class="form-group @(Model.CampgroundEditorSettingsModel.Id ? null : "advanced-setting")">
+                    <div class="col-md-3">
+                        <nop-label asp-for="Id" />
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-text-row">@Model.Id</div>
+                    </div>
+                </div>
+}
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.CampgroundType ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="CampgroundTypeId" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-select asp-for="CampgroundTypeId" asp-items="@Model.AvailableCampgroundTypes" />
+                            <span asp-validation-for="CampgroundTypeId"></span>
+                        </div>
+                    </div>
+                    @if (Model.Id > 0 && Model.AssociatedToCampgroundId > 0)
+    {
+                <div class="form-group @(Model.CampgroundEditorSettingsModel.CampgroundType ? null : "advanced-setting")">
+                    <div class="col-md-3">
+                        <nop-label asp-for="AssociatedToCampgroundId" />
+                    </div>
+                    <div class="col-md-9">
+                        <a asp-controller="Campground" asp-action="Edit" asp-route-id="@Model.AssociatedToCampgroundId">@Model.AssociatedToCampgroundName</a>
+                    </div>
+                </div>
+}
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.CampgroundTemplate ? null : "advanced-setting")" @(Model.AvailableCampgroundTemplates.SelectionIsNotPossible() ? Html.Raw("style=\"display:none\"") : null) id="pnlCampgroundTemplateId">
+                        <div class="col-md-3">
+                            <nop-label asp-for="CampgroundTemplateId" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-select asp-for="CampgroundTemplateId" asp-items="Model.AvailableCampgroundTemplates" />
+                            <span asp-validation-for="CampgroundTemplateId"></span>
+                        </div>
+                    </div>
+                    @(Html.LocalizedEditor<CampgroundModel, CampgroundLocalizedModel>("campground-info-localized",
+                @<div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.Locales[item].Name" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="@Model.Locales[item].Name" />
+                            <span asp-validation-for="@Model.Locales[item].Name"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.Locales[item].ShortDescription" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="@Model.Locales[item].ShortDescription" />
+                            <span asp-validation-for="@Model.Locales[item].ShortDescription"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="@Model.Locales[item].FullDescription" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="@Model.Locales[item].FullDescription" asp-template="RichEditor" />
+                            <span asp-validation-for="@Model.Locales[item].FullDescription"></span>
+                        </div>
+                    </div>
+
+                    <input type="hidden" asp-for="@Model.Locales[item].LanguageId" />
+                </div>
+                                    ,@<div>
+                                        <div class="form-group">
+                                            <div class="col-md-3">
+                                                <nop-label asp-for="Name" />
+                                            </div>
+                                            <div class="col-md-9">
+                                                <nop-editor asp-for="Name" asp-required="true" />
+                                                <span asp-validation-for="Name"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-3">
+                                                <nop-label asp-for="ShortDescription" />
+                                            </div>
+                                            <div class="col-md-9">
+                                                <nop-textarea asp-for="ShortDescription" />
+                                                <span asp-validation-for="ShortDescription"></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <div class="col-md-3">
+                                                <nop-label asp-for="FullDescription" />
+                                            </div>
+                                            <div class="col-md-9">
+                                                <nop-editor asp-for="FullDescription" asp-template="RichEditor" />
+                                                <span asp-validation-for="FullDescription"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                                                                                            ))
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Website" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="Website" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="FullUrl" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="FullUrl" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-3">
+                            <nop-label asp-for="AvailableCampsites" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="AvailableCampsites" />
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.Published ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="Published" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="Published" />
+                            <span asp-validation-for="Published"></span>
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.CampgroundTags ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="CampgroundTags" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="CampgroundTags" />
+                            <span asp-validation-for="CampgroundTags"></span>
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.ShowOnHomePage ? null : "advanced-setting")" @(Model.IsLoggedInAsCampgroundHost ? Html.Raw("style='display: none;'") : null)>
+                        <div class="col-md-3">
+                            <nop-label asp-for="ShowOnHomePage" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="ShowOnHomePage" />
+                            <span asp-validation-for="ShowOnHomePage"></span>
+                        </div>
+                    </div>
+                    <nop-nested-setting asp-for="ShowOnHomePage">
+                        <div class="form-group @(Model.CampgroundEditorSettingsModel.DisplayOrder ? null : "advanced-setting")" id="pnlDisplayOrder" @(Model.IsLoggedInAsCampgroundHost ? Html.Raw("style='display: none;'") : null)>
+                            <div class="col-md-3">
+                                <nop-label asp-for="DisplayOrder" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="DisplayOrder" />
+                                <span asp-validation-for="DisplayOrder"></span>
+                            </div>
+                        </div>
+                    </nop-nested-setting>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.AllowCampgroundReviews ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="AllowCampgroundReviews" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="AllowCampgroundReviews" />
+                            <span asp-validation-for="AllowCampgroundReviews"></span>
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.AvailableStartDate ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="AvailableStartDateTimeUtc" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="AvailableStartDateTimeUtc" />
+                            <span asp-validation-for="AvailableStartDateTimeUtc"></span>
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.AvailableEndDate ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="AvailableEndDateTimeUtc" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="AvailableEndDateTimeUtc" />
+                            <span asp-validation-for="AvailableEndDateTimeUtc"></span>
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.MarkAsNew ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="MarkAsNew" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-editor asp-for="MarkAsNew" />
+                            <span asp-validation-for="MarkAsNew"></span>
+                        </div>
+                    </div>
+                    <nop-nested-setting asp-for="MarkAsNew">
+                        <div class="form-group @(Model.CampgroundEditorSettingsModel.MarkAsNewStartDate ? null : "advanced-setting")" id="pnlMarkAsNewStartDateTimeUtc">
+                            <div class="col-md-3">
+                                <nop-label asp-for="MarkAsNewStartDateTimeUtc" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="MarkAsNewStartDateTimeUtc" />
+                                <span asp-validation-for="MarkAsNewStartDateTimeUtc"></span>
+                            </div>
+                        </div>
+                        <div class="form-group @(Model.CampgroundEditorSettingsModel.MarkAsNewEndDate ? null : "advanced-setting")" id="pnlMarkAsNewEndDateTimeUtc">
+                            <div class="col-md-3">
+                                <nop-label asp-for="MarkAsNewEndDateTimeUtc" />
+                            </div>
+                            <div class="col-md-9">
+                                <nop-editor asp-for="MarkAsNewEndDateTimeUtc" />
+                                <span asp-validation-for="MarkAsNewEndDateTimeUtc"></span>
+                            </div>
+                        </div>
+                    </nop-nested-setting>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.AdminComment ? null : "advanced-setting")">
+                        <div class="col-md-3">
+                            <nop-label asp-for="AdminComment" />
+                        </div>
+                        <div class="col-md-9">
+                            <nop-textarea asp-for="AdminComment" />
+                            <span asp-validation-for="AdminComment"></span>
+                        </div>
+                    </div>
+                    @if (Model.CreatedOn.HasValue)
+    {
+                <div class="form-group @(Model.CampgroundEditorSettingsModel.CreatedOn ? null : "advanced-setting")">
+                    <div class="col-md-3">
+                        <nop-label asp-for="CreatedOn" />
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-text-row">@Model.CreatedOn.Value.ToString("F")</div>
+                    </div>
+                </div>
+}
+                    @if (Model.UpdatedOn.HasValue)
+    {
+                <div class="form-group @(Model.CampgroundEditorSettingsModel.UpdatedOn ? null : "advanced-setting")">
+                    <div class="col-md-3">
+                        <nop-label asp-for="UpdatedOn" />
+                    </div>
+                    <div class="col-md-9">
+                        <div class="form-text-row">@Model.UpdatedOn.Value.ToString("F")</div>
+                    </div>
+                </div>
+}
+                </div>
+            </div>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_details_info_column_left_bottom", additionalData = Model.Id })
+        </div>
+    </div>
+    <div class="@(Model.CampgroundEditorSettingsModel.OneColumnCampgroundPage ? "col-md-12" : "col-md-5")">
+        <div class="panel-group">
+            @{
+                var leftColumnClass = Model.CampgroundEditorSettingsModel.OneColumnCampgroundPage ? "col-md-3" : "col-md-4";
+                var rightColumnClass = Model.CampgroundEditorSettingsModel.OneColumnCampgroundPage ? "col-md-9" : "col-md-8";
+            }
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_details_info_column_right_top", additionalData = Model.Id })
+            <div class="panel panel-default margin-bottom" id="group-associated-campgrounds">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.AssociatedCampgrounds")
+                </div>
+                @if (Model.Id > 0)
+                {
+                    <div class="panel-body">
+                        <ul class="common-list">
+                            <li>
+                                @T("admin.campgrounds.AssociatedCampgrounds.Note1")
+                            </li>
+                            <li>
+                                @T("admin.campgrounds.AssociatedCampgrounds.Note2")
+                            </li>
+                        </ul>
+                        <div id="associatedcampgrounds-grid"></div>
+                        <script type="text/javascript">
+                            $(document).ready(function() {
+                                $("#associatedcampgrounds-grid").kendoGrid({
+                                    dataSource: {
+                                        type: "json",
+                                        transport: {
+                                            read: {
+                                                url: "@Html.Raw(Url.Action("AssociatedCampgroundList", "Campground", new {campgroundId = Model.Id}))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            },
+                                            update: {
+                                                url: "@Html.Raw(Url.Action("AssociatedCampgroundUpdate", "Campground"))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            },
+                                            destroy: {
+                                                url: "@Html.Raw(Url.Action("AssociatedCampgroundDelete", "Campground"))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            }
+                                        },
+                                        schema: {
+                                            data: "Data",
+                                            total: "Total",
+                                            errors: "Errors",
+                                            model: {
+                                                id: "Id",
+                                                fields: {
+                                                    CampgroundName: { editable: false, type: "string" },
+                                                    DisplayOrder: { editable: true, type: "number" },
+                                                    Id: { editable: false, type: "number" }
+                                                }
+                                            }
+                                        },
+                                        requestEnd: function(e) {
+                                            if (e.type == "update") {
+                                                this.read();
+                                            }
+                                        },
+                                        error: function(e) {
+                                            display_kendoui_grid_error(e);
+                                            // Cancel the changes
+                                            this.cancelChanges();
+                                        },
+                                        serverPaging: true,
+                                        serverFiltering: true,
+                                        serverSorting: true
+                                    },
+                                    pageable: {
+                                        refresh: true,
+                                        numeric: false,
+                                        previousNext: false,
+                                        info: false,
+                                        @await Html.PartialAsync("_GridPagerMessages")
+                                    },
+                                    editable: {
+                                        confirmation: "@T("Admin.Common.DeleteConfirmation")",
+                                        mode: "inline"
+                                    },
+                                    scrollable: false,
+                                    columns: [
+                                        {
+                                            field: "CampgroundName",
+                                            title: "@T("admin.campgrounds.AssociatedCampgrounds.Fields.Campground")",
+                                            template: '<a href="@Url.Content("~/Admin/Campground/Edit/")#=Id#">#=CampgroundName#</a>',
+                                            width: 250
+                                        }, {
+                                            field: "DisplayOrder",
+                                            title: "@T("admin.campgrounds.AssociatedCampgrounds.Fields.DisplayOrder")",
+                                            //integer format
+                                            format: "{0:0}",
+                                            width: 120
+                                        }, {
+                                            command: [
+                                                {
+                                                    name: "edit",
+                                                    text: {
+                                                        edit: "@T("Admin.Common.Edit")",
+                                                        update: "@T("Admin.Common.Update")",
+                                                        cancel: "@T("Admin.Common.Cancel")"
+                                                    }
+                                                }, {
+                                                    name: "destroy",
+                                                    text: "@T("Admin.Common.Delete")"
+                                                }
+                                            ],
+                                            width: 220
+                                        }
+                                    ]
+                                });
+                            });
+                        </script>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" id="btnAddNewAssociatedCampground" onclick="javascript:OpenWindow('@(Url.Action("AssociatedCampgroundAddPopup", "Campground", new {campgroundId = Model.Id, btnId = "btnRefreshAssociatedCampgrounds", formId = "campground-form"}))', 800, 800, true); return false;" class="btn btn-primary">
+                            @T("admin.campgrounds.AssociatedCampgrounds.AddNew")
+                        </button>
+                        <input type="submit" id="btnRefreshAssociatedCampgrounds" style="display: none" />
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $('#btnRefreshAssociatedCampgrounds').click(function () {
+                                    //refresh grid
+                                    var grid = $("#associatedcampgrounds-grid").data('kendoGrid');
+                                    grid.dataSource.read();
+
+                                    //return false to don't reload a page
+                                    return false;
+                                });
+                            });
+                        </script>
+                    </div>
+                }
+                else
+                {
+                    <div class="panel-body">
+                        @T("admin.campgrounds.AssociatedCampgrounds.SaveBeforeEdit")
+                    </div>
+                }
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.Mappings")
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="SelectedCategoryIds" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-select asp-for="SelectedCategoryIds" asp-items="Model.AvailableCategories" asp-multiple="true" />
+                            <script type="text/javascript">
+                                $(document).ready(function() {
+                                    var categoryIdsInput = $('#@Html.IdFor(model => model.SelectedCategoryIds)').data("kendoMultiSelect");
+                                    categoryIdsInput.setOptions({
+                                        autoClose: false,
+                                        filter: "contains"
+                                    });
+
+                                    @if (Model.AvailableCategories.Count == 0)
+                            {
+                                <text>
+                                    categoryIdsInput.setOptions({
+                                        enable: false,
+                                        placeholder: '@T("Admin.Campgrounds.Fields.Categories.NoCategoriesAvailable")'
+                                    });
+                                    categoryIdsInput._placeholder();
+                                    categoryIdsInput._enable();
+                                    </text>
+                            }
+                                });
+                            </script>
+                        </div>
+                    </div>
+                    <div class="form-group @(Model.CampgroundEditorSettingsModel.CampgroundHost ? null : "advanced-setting")" @(Model.IsLoggedInAsCampgroundHost ? Html.Raw("style='display: none;'") : null)>
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="CampgroundHostId" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-select asp-for="CampgroundHostId" asp-items="Model.AvailableCampgroundHosts" />
+                            <span asp-validation-for="CampgroundHostId"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default @(Model.CampgroundEditorSettingsModel.ACL ? null : "advanced-setting")">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.Security")
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="SelectedCustomerRoleIds" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-select asp-for="SelectedCustomerRoleIds" asp-items="Model.AvailableCustomerRoles" asp-multiple="true" />
+                            <script type="text/javascript">
+                                $(document).ready(function() {
+                                    var rolesIdsInput = $('#@Html.IdFor(model => model.SelectedCustomerRoleIds)').data("kendoMultiSelect");
+                                    rolesIdsInput.setOptions({
+                                        autoClose: false,
+                                        filter: "contains"
+                                    });
+
+                                    @if (Model.AvailableCustomerRoles.Count == 0)
+                            {
+                                <text>
+                                    rolesIdsInput.setOptions({
+                                        enable: false,
+                                        placeholder: 'No customer roles available'
+                                    });
+                                    rolesIdsInput._placeholder();
+                                    rolesIdsInput._enable();
+                                    </text>
+                            }
+                                });
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default @(Model.CampgroundEditorSettingsModel.RequireOtherCampgroundsAddedToTheCart ? null : "advanced-setting")" id="group-required-other-campgrounds">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.RequireOtherCampgrounds")
+                </div>
+                <div class="panel-body">
+                    <div class="form-group">
+                        <div class="@leftColumnClass">
+                            <nop-label asp-for="RequireOtherCampgrounds" />
+                        </div>
+                        <div class="@rightColumnClass">
+                            <nop-editor asp-for="RequireOtherCampgrounds" />
+                            <span asp-validation-for="RequireOtherCampgrounds"></span>
+                        </div>
+                    </div>
+                    <nop-nested-setting asp-for="RequireOtherCampgrounds">
+                        <div class="form-group" id="pnlRequiredCampgroundIds">
+                            <div class="@leftColumnClass">
+                                <nop-label asp-for="RequiredCampgroundIds" />
+                                <span id="required-campgrounds-check-progress" style="display: none; float: right; clear: both" class="please-wait">
+                                    @T("Common.Wait...")
+                                </span>
+                            </div>
+                            <div class="@rightColumnClass">
+                                <div class="input-group">
+                                    <nop-editor asp-for="RequiredCampgroundIds" />
+                                    <span class="input-group-btn">
+                                        <input type="submit" id="btnRefreshRequiredCampgrounds" style="display: none" />
+                                        <script type="text/javascript">
+                                            $(document).ready(function () {
+                                                $('#btnRefreshRequiredCampgrounds').click(function () {
+                                                    //refresh campground list
+                                                    loadRequiredCampgroundFriendlyNames();
+
+                                                    //return false to don't reload a page
+                                                    return false;
+                                                });
+                                            });
+                                        </script>
+                                        <button type="submit" id="btnAddNewRequiredCampground" onclick="javascript:OpenWindow('@(Url.Action("RequiredCampgroundAddPopup", "Campground", new {btnId = "btnRefreshRequiredCampgrounds", campgroundIdsInput = "RequiredCampgroundIds"}))', 800, 850, true); return false;" class="btn btn-info">
+                                            @T("Admin.Campgrounds.Fields.RequiredCampgroundIds.AddNew")
+                                        </button>
+                                    </span>
+                                </div>
+                                <span id="required-campground-names"></span>
+                                @Html.ValidationMessageFor(model => model.RequiredCampgroundIds)
+                            </div>
+                        </div>
+                        <div class="form-group" id="pnlAutomaticallyAddRequiredCampgrounds">
+                            <div class="@leftColumnClass">
+                                <nop-label asp-for="AutomaticallyAddRequiredCampgrounds" />
+                            </div>
+                            <div class="@rightColumnClass">
+                                <nop-editor asp-for="AutomaticallyAddRequiredCampgrounds" />
+                                <span asp-validation-for="AutomaticallyAddRequiredCampgrounds"></span>
+                            </div>
+                        </div>
+                    </nop-nested-setting>
+                </div>
+            </div>
+            <div class="panel panel-default @(Model.CampgroundEditorSettingsModel.RelatedCampgrounds ? null : "advanced-setting")">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.RelatedCampgrounds")
+                </div>
+                @if (Model.Id > 0)
+                {
+                    <div class="panel-body">
+                        <p>
+                            @T("admin.campgrounds.RelatedCampgrounds.Hint")
+                        </p>
+                        <div id="relatedcampgrounds-grid"></div>
+                        <script type="text/javascript">
+                            $(document).ready(function() {
+                                $("#relatedcampgrounds-grid").kendoGrid({
+                                    dataSource: {
+                                        type: "json",
+                                        transport: {
+                                            read: {
+                                                url: "@Html.Raw(Url.Action("RelatedCampgroundList", "Campground", new {campgroundId = Model.Id}))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            },
+                                            update: {
+                                                url: "@Html.Raw(Url.Action("RelatedCampgroundUpdate", "Campground"))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            },
+                                            destroy: {
+                                                url: "@Html.Raw(Url.Action("RelatedCampgroundDelete", "Campground"))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            }
+                                        },
+                                        schema: {
+                                            data: "Data",
+                                            total: "Total",
+                                            errors: "Errors",
+                                            model: {
+                                                id: "Id",
+                                                fields: {
+                                                    Campground2Name: { editable: false, type: "string" },
+                                                    DisplayOrder: { editable: true, type: "number" },
+                                                    CampgroundId2: { editable: false, type: "number" }
+                                                }
+                                            }
+                                        },
+                                        requestEnd: function(e) {
+                                            if (e.type == "update") {
+                                                this.read();
+                                            }
+                                        },
+                                        error: function(e) {
+                                            display_kendoui_grid_error(e);
+                                            // Cancel the changes
+                                            this.cancelChanges();
+                                        },
+                                        serverPaging: true,
+                                        serverFiltering: true,
+                                        serverSorting: true
+                                    },
+                                    pageable: {
+                                        refresh: true,
+                                        numeric: false,
+                                        previousNext: false,
+                                        info: false,
+                                        @await Html.PartialAsync("_GridPagerMessages")
+                                    },
+                                    editable: {
+                                        confirmation: "@T("Admin.Common.DeleteConfirmation")",
+                                        mode: "inline"
+                                    },
+                                    scrollable: false,
+                                    columns: [
+                                        {
+                                            field: "Campground2Name",
+                                            title: "@T("admin.campgrounds.RelatedCampgrounds.Fields.Campground")",
+                                            width: 250,
+                                            template: '<a href="@Url.Content("~/Admin/Campground/Edit/")#=CampgroundId2#">#=Campground2Name#</a>'
+                                        }, {
+                                            field: "DisplayOrder",
+                                            title: "@T("admin.campgrounds.RelatedCampgrounds.Fields.DisplayOrder")",
+                                            //integer format
+                                            format: "{0:0}",
+                                            width: 120
+                                        }, {
+                                            command: [
+                                                {
+                                                    name: "edit",
+                                                    text: {
+                                                        edit: "@T("Admin.Common.Edit")",
+                                                        update: "@T("Admin.Common.Update")",
+                                                        cancel: "@T("Admin.Common.Cancel")"
+                                                    }
+                                                }, {
+                                                    name: "destroy",
+                                                    text: "@T("Admin.Common.Delete")"
+                                                }
+                                            ],
+                                            width: 220
+                                        }
+                                    ]
+                                });
+                            });
+                        </script>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" id="btnAddNewRelatedCampground" class="btn btn-primary" onclick="javascript:OpenWindow('@(Url.Action("RelatedCampgroundAddPopup", "Campground", new {campgroundId = Model.Id, btnId = "btnRefreshRelatedCampgrounds", formId = "campground-form"}))', 800, 800, true); return false;">
+                            @T("admin.campgrounds.RelatedCampgrounds.AddNew")
+                        </button>
+                        <input type="submit" id="btnRefreshRelatedCampgrounds" style="display: none" />
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $('#btnRefreshRelatedCampgrounds').click(function () {
+                                    //refresh grid
+                                    var grid = $("#relatedcampgrounds-grid").data('kendoGrid');
+                                    grid.dataSource.read();
+
+                                    //return false to don't reload a page
+                                    return false;
+                                });
+                            });
+                        </script>
+                    </div>
+                }
+                else
+                {
+                    <div class="panel-body">
+                        @T("admin.campgrounds.RelatedCampgrounds.SaveBeforeEdit")
+                    </div>
+                }
+            </div>
+            <div class="panel panel-default @(Model.CampgroundEditorSettingsModel.CrossSellsCampgrounds ? null : "advanced-setting")">
+                <div class="panel-heading">
+                    @T("admin.campgrounds.CrossSells")
+                </div>
+                @if (Model.Id > 0)
+                {
+                    <div class="panel-body">
+                        <p>
+                            @T("admin.campgrounds.CrossSells.Hint")
+                        </p>
+                        <div id="crosssellcampgrounds-grid"></div>
+                        <script type="text/javascript">
+                            $(document).ready(function() {
+                                $("#crosssellcampgrounds-grid").kendoGrid({
+                                    dataSource: {
+                                        type: "json",
+                                        transport: {
+                                            read: {
+                                                url: "@Html.Raw(Url.Action("CrossSellCampgroundList", "Campground", new {campgroundId = Model.Id}))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            },
+                                            destroy: {
+                                                url: "@Html.Raw(Url.Action("CrossSellCampgroundDelete", "Campground"))",
+                                                type: "POST",
+                                                dataType: "json",
+                                                data: addAntiForgeryToken
+                                            }
+                                        },
+                                        schema: {
+                                            data: "Data",
+                                            total: "Total",
+                                            errors: "Errors",
+                                            model: {
+                                                id: "Id",
+                                                fields: {
+                                                    Campground2Name: { editable: false, type: "string" },
+                                                    CampgroundId2: { editable: false, type: "number" }
+                                                }
+                                            }
+                                        },
+                                        error: function(e) {
+                                            display_kendoui_grid_error(e);
+                                            // Cancel the changes
+                                            this.cancelChanges();
+                                        },
+                                        serverPaging: true,
+                                        serverFiltering: true,
+                                        serverSorting: true
+                                    },
+                                    pageable: {
+                                        refresh: true,
+                                        numeric: false,
+                                        previousNext: false,
+                                        info: false,
+                                        @await Html.PartialAsync("_GridPagerMessages")
+                                    },
+                                    editable: {
+                                        confirmation: "@T("Admin.Common.DeleteConfirmation")",
+                                        mode: "inline"
+                                    },
+                                    scrollable: false,
+                                    columns: [
+                                        {
+                                            field: "Campground2Name",
+                                            title: "@T("admin.campgrounds.CrossSells.Fields.Campground")",
+                                            template: '<a href="@Url.Content("~/Admin/Campground/Edit/")#=CampgroundId2#">#=Campground2Name#</a>'
+                                        }, {
+                                            command: { name: "destroy", text: "@T("Admin.Common.Delete")" },
+                                            title: "@T("Admin.Common.Delete")",
+                                            width: 200
+                                        }
+                                    ]
+                                });
+                            });
+                        </script>
+                    </div>
+                    <div class="panel-footer">
+                        <button type="submit" id="btnAddNewCrossSellCampground" onclick="javascript:OpenWindow('@(Url.Action("CrossSellCampgroundAddPopup", "Campground", new {campgroundId = Model.Id, btnId = "btnRefreshCrossSellCampgrounds", formId = "campground-form"}))', 800, 800, true); return false;" class="btn btn-primary">
+                            @T("admin.campgrounds.CrossSells.AddNew")
+                        </button>
+                        <input type="submit" id="btnRefreshCrossSellCampgrounds" style="display: none" />
+                        <script type="text/javascript">
+                            $(document).ready(function () {
+                                $('#btnRefreshCrossSellCampgrounds').click(function () {
+                                    //refresh grid
+                                    var grid = $("#crosssellcampgrounds-grid").data('kendoGrid');
+                                    grid.dataSource.read();
+
+                                    //return false to don't reload a page
+                                    return false;
+                                });
+                            });
+                        </script>
+                    </div>
+                }
+                else
+                {
+                    <div class="panel-body">
+                        @T("admin.campgrounds.CrossSells.SaveBeforeEdit")
+                    </div>
+                }
+            </div>
+            @await Component.InvokeAsync("AdminWidget", new { widgetZone = "admin_campground_details_info_column_right_bottom", additionalData = Model.Id })
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+﻿@model CampgroundReviewOverviewModel
+@using System.Globalization
+@{
+
+}
+@if (Model.AllowCampgroundReviews)
+{
+    <div class="campground-reviews-overview" @if (Model.TotalReviews > 0) { <text> itemprop="aggregateRating" itemscope itemtype="http://schema.org/AggregateRating" </text> }>
+        <div class="campground-review-box" id="addCampgroundReviews-@Model.CampgroundId" style="display:none;">
+            <app-campground-review campgroundId="@Model.CampgroundId">Loading...</app-campground-review>
+        </div>
+
+        @if (Model.TotalReviews > 0)
+        {
+            <div>
+                <span>@await Component.InvokeAsync("CampgroundRating", new { campgroundId = Model.CampgroundId })</span> |
+                <span itemprop="reviewCount">@Model.TotalReviews  @T("Reviews.Overview.Reviews")</span>
+                <span> | <a class="btnAddReview" onclick="addReview(@Model.CampgroundId, false)">@T("Reviews.Overview.AddNew")</a></span>
+            </div>
+        }
+        else
+        {
+            <div class="campground-no-reviews">
+                <a class="btnAddReview" onclick="addReview(@Model.CampgroundId, false)">@T("CampgroundReviews.Overview.First")</a>
+            </div>
+        }
+    </div>
+}

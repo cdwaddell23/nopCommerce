@@ -1,0 +1,18 @@
+﻿@{
+    Layout = "~/Themes/NopElectro/Views/Shared/_Root.cshtml";
+
+    Html.AddScriptParts(ResourceLocation.Head, "https://code.angularjs.org/1.7.8/angular.min.js", excludeFromBundle: true);
+    Html.AddScriptParts(ResourceLocation.Head, "https://code.angularjs.org/1.7.8/angular-route.min.js", excludeFromBundle: true);
+    Html.AddScriptParts(ResourceLocation.Head, "https://code.angularjs.org/1.7.8/angular-resource.min.js", excludeFromBundle: true);
+    }
+@if (IsSectionDefined("Breadcrumb"))
+{
+    @section Breadcrumb {
+        @RenderSection("Breadcrumb")
+    }
+}
+<div class="center-1">
+    @await Component.InvokeAsync("Widget", new { widgetZone = "main_column_before" })
+    @RenderBody()
+    @await Component.InvokeAsync("Widget", new { widgetZone = "main_column_after" })
+</div>
